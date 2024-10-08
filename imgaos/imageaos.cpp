@@ -1,3 +1,7 @@
-//
-// Created by lucas on 03/10/2024.
-//
+/* Support for image processing with AOS (headers) */
+
+struct Pixel {
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+};
