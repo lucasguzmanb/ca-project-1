@@ -1,3 +1,5 @@
+/* SOA */
+
 #include <iostream>
 
 int main() {

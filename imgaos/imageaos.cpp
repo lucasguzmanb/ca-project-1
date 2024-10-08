@@ -1,4 +1,5 @@
 /* Support for image processing with AOS (headers) */
+#include <cstdint>
 
 struct Pixel {
     uint8_t r;
