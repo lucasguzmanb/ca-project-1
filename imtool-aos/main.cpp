@@ -6,16 +6,11 @@
 #include <vector>
 
 int main(int const argc, char * argv[]) {
-  // check parameters
-  std::vector<std::string> args;
-  if (argc > 1) {
-    std::span<char *> args_view(argv + 1, std::size_t(argc - 1));
-    args = {args_view.begin(), args_view.end()};
-    print_arguments(args);
-  } else {
-    std::cout << "No arguments provided." << std::endl;
-  }
-
+  // check & parse arguments
+  check_minimum_args(argc);
+  std::span<char *> args_view(argv + 1, std::size_t(argc - 1));
+  std::vector<std::string> const args_vector = {args_view.begin(), args_view.end()};
+  Arguments const args =  parse_args(args_vector);
   print_arguments(args);
 
   return 0;
