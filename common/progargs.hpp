@@ -12,10 +12,12 @@ struct Arguments {
   std::vector<int> extra;
 };
 
-void print_arguments(Arguments arguments);
+void print_arguments(Arguments const & arguments);
 
 void check_minimum_args(int argc);
 
 Arguments parse_args(std::vector<std::string> const & argv);
+
+void check_args(Arguments const & args);
 
 #endif // PROGARGS_HPP
