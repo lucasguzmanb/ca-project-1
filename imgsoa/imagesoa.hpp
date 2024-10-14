@@ -1,0 +1,4 @@
+#ifndef IMAGESOA_HPP
+#define IMAGESOA_HPP
+
+#endif // IMAGESOA_HPP

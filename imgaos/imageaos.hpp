@@ -1,0 +1,4 @@
+#ifndef IMAGEAOS_HPP
+#define IMAGEAOS_HPP
+
+#endif // IMAGEAOS_HPP
