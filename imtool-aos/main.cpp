@@ -1,6 +1,5 @@
 /* AOS */
 #include "common/progargs.hpp"
-
 #include <iostream>
 #include <span>
 #include <vector>

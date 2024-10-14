@@ -1,0 +1,4 @@
+#ifndef COMPRESS_HPP
+#define COMPRESS_HPP
+
+#endif //COMPRESS_HPP

@@ -1,0 +1,4 @@
+#ifndef MAXLEVEL_SOA_HPP
+#define MAXLEVEL_SOA_HPP
+
+#endif //MAXLEVEL_SOA_HPP
