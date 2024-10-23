@@ -1,10 +1,8 @@
 #ifndef MAXLEVEL_SOA_HPP
 #define MAXLEVEL_SOA_HPP
-#include <vector>
+#include "imagesoa.hpp"
 
 template <typename T>
-struct ImageSoA {
-    std::vector<T> r, g, b;
-};
+ImageSOA<T> maxlevel(ImageSOA<T> inputImage, int oldLevel, int newLevel);
 
 #endif //MAXLEVEL_SOA_HPP

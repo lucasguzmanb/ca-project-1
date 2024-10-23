@@ -1,6 +1,7 @@
 # Add to this list all files related to imgaos library
 add_library(imgaos
         imageaos.cpp
+        imageaos.hpp
         cutfreq.cpp
         cutfreq.hpp
         maxlevel.cpp
