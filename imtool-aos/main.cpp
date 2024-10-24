@@ -57,7 +57,17 @@ int main(int const argc, char * argv[]) {
     } else {
       // Handle error or unexpected variant type
     }
-  } else {
+  }
+  if (args.operation == "resize"){
+        if (isInputUint8) {
+            outputPixels = resize<uint8_t>(std::get<std::vector<Pixel<uint8_t>>>(inputPixels), metadata, args.extra);
+        } else {
+            outputPixels = resize<uint16_t>(std::get<std::vector<Pixel<uint16_t>>>(inputPixels), metadata, args.extra);
+        }
+        metadata.width = args.extra[0];
+        metadata.height = args.extra[1];
+    }
+   else {
     std::cerr << "Error: unknown operation\n";
     exit(-1);
   }
