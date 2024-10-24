@@ -54,20 +54,18 @@ int main(int const argc, char * argv[]) {
     } else {
       outputPixels = maxlevel<uint16_t>(std::get<std::vector<Pixel<uint16_t>>>(inputPixels),
                                         metadata.width, metadata.height);
+    }
+  } else if (args.operation == "resize") {
+    if (isInputUint8) {
+      outputPixels =
+          resize<uint8_t>(std::get<std::vector<Pixel<uint8_t>>>(inputPixels), metadata, args.extra);
     } else {
-      // Handle error or unexpected variant type
+      outputPixels = resize<uint16_t>(std::get<std::vector<Pixel<uint16_t>>>(inputPixels), metadata,
+                                      args.extra);
     }
-  }
-  else if (args.operation == "resize"){
-        if (isInputUint8) {
-            outputPixels = resize<uint8_t>(std::get<std::vector<Pixel<uint8_t>>>(inputPixels), metadata, args.extra);
-        } else {
-            outputPixels = resize<uint16_t>(std::get<std::vector<Pixel<uint16_t>>>(inputPixels), metadata, args.extra);
-        }
-        metadata.width = args.extra[0];
-        metadata.height = args.extra[1];
-    }
-   else {
+    metadata.width  = args.extra[0];
+    metadata.height = args.extra[1];
+  } else {
     std::cerr << "Error: unknown operation\n";
     exit(-1);
   }
@@ -86,9 +84,11 @@ int main(int const argc, char * argv[]) {
 
   // write binary data
   if (std::holds_alternative<std::vector<Pixel<uint8_t>>>(outputPixels)) {
-    AOSToBinary<uint8_t>(outputFile, std::get<std::vector<Pixel<uint8_t>>>(outputPixels), metadata.width, metadata.height);
+    AOSToBinary<uint8_t>(outputFile, std::get<std::vector<Pixel<uint8_t>>>(outputPixels),
+                         metadata.width, metadata.height);
   } else if (std::holds_alternative<std::vector<Pixel<uint16_t>>>(outputPixels)) {
-    AOSToBinary<uint16_t>(outputFile, std::get<std::vector<Pixel<uint16_t>>>(outputPixels), metadata.width, metadata.height);
+    AOSToBinary<uint16_t>(outputFile, std::get<std::vector<Pixel<uint16_t>>>(outputPixels),
+                          metadata.width, metadata.height);
   } else {
     std::cerr << "Error: unknown variant type\n";
   }
