@@ -58,7 +58,7 @@ int main(int const argc, char * argv[]) {
       // Handle error or unexpected variant type
     }
   }
-  if (args.operation == "resize"){
+  else if (args.operation == "resize"){
         if (isInputUint8) {
             outputPixels = resize<uint8_t>(std::get<std::vector<Pixel<uint8_t>>>(inputPixels), metadata, args.extra);
         } else {
