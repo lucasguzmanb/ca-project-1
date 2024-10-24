@@ -83,11 +83,6 @@ int main(int const argc, char * argv[]) {
     std::cerr << "Error: unknown variant type\n";
   }
 
-  /*for (size_t i = 0; i < 100; ++i) {
-    std::cout << "input R of pixel  " << i << ": " << std::get<std::vector<Pixel<uint8_t>>>(inputPixels)[i].r << "\n" ;
-    std::cout << "Output R of pixel  " << i << ": " << std::get<std::vector<Pixel<uint16_t>>>(outputPixels)[i].r << "\n";
-
-  }*/
   inputFile.close();
   outputFile.close();
 
