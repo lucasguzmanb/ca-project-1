@@ -3,6 +3,7 @@
 #include "common/progargs.hpp"
 #include "imgaos/imageaos.hpp"
 #include "imgaos/maxlevel.hpp"
+#include "imgaos/resize.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -26,7 +27,7 @@ int main(int const argc, char * argv[]) {
     exit(-1);
   }
 
-  Metadata const metadata = obtainMetadata(inputFile);
+  Metadata metadata = obtainMetadata(inputFile);
   // check if file is in P6 format
   if (metadata.format != "P6") {
     std::cerr << "Error: file is not in .ppm format\n";
@@ -56,7 +57,17 @@ int main(int const argc, char * argv[]) {
     } else {
       // Handle error or unexpected variant type
     }
-  } else {
+  } 
+  else if (args.operation == "resize"){
+        if (isInputUint8) {
+            outputPixels = resize<uint8_t>(std::get<std::vector<Pixel<uint8_t>>>(inputPixels), metadata, args.extra);
+        } else {
+            outputPixels = resize<uint16_t>(std::get<std::vector<Pixel<uint16_t>>>(inputPixels), metadata, args.extra);
+        }
+        metadata.width = args.extra[0];
+        metadata.height = args.extra[1];
+    }
+  else {
     std::cerr << "Error: unknown operation\n";
     exit(-1);
   }
