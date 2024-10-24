@@ -2,8 +2,8 @@
 add_library(imgaos
         imageaos.cpp
         imageaos.hpp
-        cutfreq.cpp
-        cutfreq.hpp
+        #[[cutfreq.cpp
+        cutfreq.hpp]] # uncomment this line when cutfreq is implemented
         maxlevel.cpp
         maxlevel.hpp
         resize.cpp

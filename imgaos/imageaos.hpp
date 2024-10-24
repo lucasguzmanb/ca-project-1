@@ -24,11 +24,13 @@ std::vector<Pixel<T>> binaryToAOS(std::ifstream & inputFile, int width, int heig
 }
 
 template <typename T>
-void AOSToBinary(std::ofstream & outputFile, std::vector<Pixel<T>> const & data) {
-  for (auto const & pixel : data) {
-    write_binary<T>(outputFile, pixel.r);
-    write_binary<T>(outputFile, pixel.g);
-    write_binary<T>(outputFile, pixel.b);
+void AOSToBinary(std::ofstream & outputFile, std::vector<Pixel<T>> const & data, int const width,
+                 int const height) {
+  auto dataSize = static_cast<std::size_t>(width * height);
+  for (std::size_t i = 0; i < dataSize; ++i) {
+    writeBinary(outputFile, data[i].r);
+    writeBinary(outputFile, data[i].g);
+    writeBinary(outputFile, data[i].b);
   }
 }
 #endif  // IMAGEAOS_HPP

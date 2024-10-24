@@ -22,7 +22,7 @@ T readBinary(std::istream & input) {
 }
 
 template <typename T>
-void write_binary(std::ostream & output, T const & value) {
+void writeBinary(std::ostream & output, T const & value) {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     output.write(reinterpret_cast<char const *>(&value), sizeof(value));
 }

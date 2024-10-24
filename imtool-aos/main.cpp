@@ -20,7 +20,7 @@ int main(int const argc, char * argv[]) {
   print_arguments(args);
 
   // open input file
-  std::ifstream inputFile(args.input.c_str(), std::ios::binary);
+  std::ifstream inputFile(args.input, std::ios::binary);
   // check if file exists or can be opened
   if (!inputFile.is_open()) {
     std::cerr << "Error: can't open file " << args.input << '\n';
@@ -48,52 +48,46 @@ int main(int const argc, char * argv[]) {
   std::variant<std::vector<Pixel<uint8_t>>, std::vector<Pixel<uint16_t>>> outputPixels;
 
   if (args.operation == "maxlevel") {
-    if (std::holds_alternative<std::vector<Pixel<uint8_t>>>(inputPixels)) {
+    if (isInputUint8) {
       outputPixels = maxlevel<uint8_t>(std::get<std::vector<Pixel<uint8_t>>>(inputPixels),
-                                       metadata.width, metadata.height);
-    } else if (std::holds_alternative<std::vector<Pixel<uint16_t>>>(inputPixels)) {
+                                       metadata.maxColorValue, args.extra[0]);
+    } else {
       outputPixels = maxlevel<uint16_t>(std::get<std::vector<Pixel<uint16_t>>>(inputPixels),
                                         metadata.width, metadata.height);
     } else {
       // Handle error or unexpected variant type
     }
-  } 
-  else if (args.operation == "resize"){
-        if (isInputUint8) {
-            outputPixels = resize<uint8_t>(std::get<std::vector<Pixel<uint8_t>>>(inputPixels), metadata, args.extra);
-        } else {
-            outputPixels = resize<uint16_t>(std::get<std::vector<Pixel<uint16_t>>>(inputPixels), metadata, args.extra);
-        }
-        metadata.width = args.extra[0];
-        metadata.height = args.extra[1];
-    }
-  else {
+  } else {
     std::cerr << "Error: unknown operation\n";
     exit(-1);
   }
 
   // open output file
-  std::ofstream outputFile(args.output.c_str(), std::ios::binary);
+  std::ofstream outputFile(args.output, std::ios::binary);
   // check if file can be created
   if (!outputFile.is_open()) {
     std::cerr << "Error: can't create file " << args.output << '\n';
     exit(-1);
   }
   // write metadata
-  outputFile << metadata.format << '\n'
+  outputFile << "P6" << '\n'
              << metadata.width << ' ' << metadata.height << '\n'
-             << metadata.maxColorValue << '\n';
+             << args.extra[0] << '\n';
 
   // write binary data
   if (std::holds_alternative<std::vector<Pixel<uint8_t>>>(outputPixels)) {
-    AOSToBinary<uint8_t>(outputFile, std::get<std::vector<Pixel<uint8_t>>>(outputPixels));
-
+    AOSToBinary<uint8_t>(outputFile, std::get<std::vector<Pixel<uint8_t>>>(outputPixels), metadata.width, metadata.height);
   } else if (std::holds_alternative<std::vector<Pixel<uint16_t>>>(outputPixels)) {
-    AOSToBinary<uint16_t>(outputFile, std::get<std::vector<Pixel<uint16_t>>>(outputPixels));
+    AOSToBinary<uint16_t>(outputFile, std::get<std::vector<Pixel<uint16_t>>>(outputPixels), metadata.width, metadata.height);
   } else {
-    // Handle error or unexpected variant type
+    std::cerr << "Error: unknown variant type\n";
   }
 
+  /*for (size_t i = 0; i < 100; ++i) {
+    std::cout << "input R of pixel  " << i << ": " << std::get<std::vector<Pixel<uint8_t>>>(inputPixels)[i].r << "\n" ;
+    std::cout << "Output R of pixel  " << i << ": " << std::get<std::vector<Pixel<uint16_t>>>(outputPixels)[i].r << "\n";
+
+  }*/
   inputFile.close();
   outputFile.close();
 
