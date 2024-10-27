@@ -33,4 +33,15 @@ void AOSToBinary(std::ofstream & outputFile, std::vector<Pixel<T>> const & data,
     writeBinary(outputFile, data[i].b);
   }
 }
+
+struct Pixel {
+  unsigned short red;    // Red component (0-65535)
+  unsigned short green;  // Green component (0-65535)
+  unsigned short blue;   // Blue component (0-65535)
+
+  // Constructor for easy initialization
+  Pixel(unsigned short r = 0, unsigned short g = 0, unsigned short b = 0) : red(r), green(g), blue(b) {}
+}
+
+
 #endif  // IMAGEAOS_HPP

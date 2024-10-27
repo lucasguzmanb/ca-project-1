@@ -4,43 +4,38 @@
 #include <iostream>
 
 // Constructor implementation
-Compressor::Compressor(const ImageAOS& img) : image(img) {}
+CCompress::CCompress(const std::string& outputFilePath) : outputFilePath(outputFilePath) {}
 
-// Compression function implementation
-void Compressor::compress(const std::string& outputFile) {
-    std::unordered_map<Pixel, int, PixelHash> colorMap; // Hash map to store unique colors
-    std::vector<int> compressedData; // Vector to store indices of colors
-
-    // Create a color map
-    for (const auto& pixel : image.pixels) {
-        if (colorMap.find(pixel) == colorMap.end()) {
-            colorMap[pixel] = colorMap.size(); // Assign a new index
-        }
-        compressedData.push_back(colorMap[pixel]); // Store the index
+void CCompress::compress(const std::vector<Pixel>& imagePixels) {
+    // Convert the image pixels to a format suitable for compression
+    std::vector<uint8_t> rawData;
+    for (const auto& pixel : imagePixels) {
+        rawData.push_back(pixel.red);
+        rawData.push_back(pixel.green);
+        rawData.push_back(pixel.blue);
     }
 
-    // Write the compressed data to a file
-    std::ofstream outFile(outputFile, std::ios::binary);
-    if (!outFile) {
-        std::cerr << "Error opening output file!" << std::endl;
+    // Compress the raw data using zlib
+    uLongf compressedSize = compressBound(rawData.size());
+    std::vector<uint8_t> compressedData(compressedSize);
+
+    if (compress(compressedData.data(), &compressedSize, rawData.data(), rawData.size()) != Z_OK) {
+        std::cerr << "Compression failed!" << std::endl;
         return;
     }
 
-    // Write the size of the color map
-    int colorMapSize = colorMap.size();
-    outFile.write(reinterpret_cast<char*>(&colorMapSize), sizeof(colorMapSize));
-
-    // Write the color map
-    for (const auto& entry : colorMap) {
-        outFile.write(reinterpret_cast<const char*>(&entry.first), sizeof(Pixel));
-    }
-
-    // Write the compressed data
-    for (const auto& index : compressedData) {
-        outFile.write(reinterpret_cast<char*>(&index), sizeof(index));
-    }
-
-    outFile.close();
+    compressedData.resize(compressedSize); // Resize to actual compressed size
+    writeCompressedData(compressedData);
 }
 
+void CCompress::writeCompressedData(const std::vector<uint8_t>& compressedData) {
+    std::ofstream outFile(outputFilePath, std::ios::binary);
+    if (!outFile) {
+        std::cerr << "Error opening output file: " << outputFilePath << std::endl;
+        return;
+    }
+
+    outFile.write(reinterpret_cast<const char*>(compressedData.data()), compressedData.size());
+    outFile.close();
+}
 
