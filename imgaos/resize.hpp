@@ -21,7 +21,7 @@ std::vector<Pixel<T> > resize(std::vector<Pixel<T> > pixels, Metadata metadata, 
 
     // Define the new dimensions
     int newWidth = size[0], newHeight = size[1];
-    std::vector<Pixel<T> > newPixels(newWidth * newHeight);
+    std::vector<Pixel<T> > newPixels(static_cast<size_t>(newWidth) * newHeight);
 
     Pixel<T> c1, c2;
     for (int i = 0; i < newHeight; i++) {
@@ -35,9 +35,9 @@ std::vector<Pixel<T> > resize(std::vector<Pixel<T> > pixels, Metadata metadata, 
             double y_diff = i * (double)metadata.height / newHeight - y_l;
 
             // Perform interpolation
-            c1 = interpolation<T>(pixels[y_l * metadata.width + x_l], pixels[y_l * metadata.width + x_h], x_diff);
-            c2 = interpolation<T>(pixels[y_h * metadata.width + x_l], pixels[y_h * metadata.width + x_h], x_diff);
-            newPixels[i * newWidth + j] = interpolation<T>(c1, c2, y_diff);
+            c1 = interpolation<T>(pixels[static_cast<size_t>(y_l * metadata.width + x_l)], pixels[static_cast<size_t>(y_l * metadata.width + x_h)], x_diff);
+            c2 = interpolation<T>(pixels[static_cast<size_t>(y_h * metadata.width + x_l)], pixels[static_cast<size_t>(y_h * metadata.width + x_h)], x_diff);
+            newPixels[static_cast<size_t>(i * newWidth + j)] = interpolation<T>(c1, c2, y_diff);
         }
     }
     return newPixels;
