@@ -80,7 +80,7 @@ int main(int const argc, char * argv[]) {
   // write metadata
   outputFile << "P6" << '\n'
              << metadata.width << ' ' << metadata.height << '\n'
-             << args.extra[0] << '\n';
+             << metadata.maxColorValue << '\n';
 
   // write binary data
   if (std::holds_alternative<std::vector<Pixel<uint8_t>>>(outputPixels)) {

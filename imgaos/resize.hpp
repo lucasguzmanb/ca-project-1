@@ -10,9 +10,9 @@
 template <typename T>
 Pixel<T> interpolation(Pixel<T> c1, Pixel<T> c2, double frac) {
     Pixel<T> result;
-    result.b = static_cast<int>(c1.b) + (static_cast<int>(c2.b)- static_cast<int>(c1.b)) * frac;
-    result.r = static_cast<int>(c1.r) + (static_cast<int>(c2.r)- static_cast<int>(c1.r)) * frac;
-    result.g = static_cast<int>(c1.g) + (static_cast<int>(c2.g)- static_cast<int>(c1.g)) * frac;
+    result.r = static_cast<T>(c1.r + (c2.r - c1.r) * frac);
+    result.g = static_cast<T>(c1.g + (c2.g - c1.g) * frac);
+    result.b = static_cast<T>(c1.b + (c2.b - c1.b) * frac);
     return result;
 }
 
@@ -21,7 +21,7 @@ std::vector<Pixel<T> > resize(std::vector<Pixel<T> > pixels, Metadata metadata, 
 
     // Define the new dimensions
     int newWidth = size[0], newHeight = size[1];
-    std::vector<Pixel<T> > newPixels(static_cast<size_t>(newWidth) * newHeight);
+    std::vector<Pixel<T> > newPixels(static_cast<size_t>(newWidth * newHeight));
 
     Pixel<T> c1, c2;
     for (int i = 0; i < newHeight; i++) {

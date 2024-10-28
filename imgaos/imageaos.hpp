@@ -4,11 +4,16 @@
 #include <common/binaryio.hpp>
 #include <cstddef>
 #include <fstream>
+#include <tuple>
 #include <vector>
 
 template <typename T>
 struct Pixel {
     T r, g, b;
+
+  bool operator==(const Pixel<T>& other) const {
+    return std::tie(r, g, b) == std::tie(other.r, other.g, other.b);
+  }
 };
 
 template <typename T>

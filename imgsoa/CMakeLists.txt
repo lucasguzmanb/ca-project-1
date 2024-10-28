@@ -12,13 +12,6 @@ add_library(imgsoa
         info.hpp
         compress.cpp
         compress.hpp
-        resize.cpp
-        resize.hpp
-        info.cpp
-        info.hpp
-        compress.cpp
-        compress.hpp
-        imagesoa.hpp
 )
 # Use this line only if you have dependencies from this library to GSL
 target_link_libraries (imgsoa PRIVATE common Microsoft.GSL::GSL)
