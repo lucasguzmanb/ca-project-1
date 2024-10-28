@@ -36,15 +36,17 @@ void removeLFCsoa(RGB<T>& image, int n) {
     std::vector<std::pair<std::tuple<T, T, T>, int>> colorFreq(frequency.begin(), frequency.end());
     std::sort(colorFreq.begin(), colorFreq.end(), [](const auto& a, const auto& b) {
         if (a.second != b.second) return a.second < b.second; // Sort by frequency
-        return std::tie(std::get<2>(b.first), std::get<1>(b.first), std::get<0>(b.first) ) <
-               std::tie(std::get<2>(a.first), std::get<1>(a.first), std::get<0>(a.first));
+        return std::tie(std::get<2>(b.first), std::get<1>(b.first), std::get<0>(b.first)) <
+               std::tie(std::get<2>(a.first), std::get<1>(a.first), std::get<0>(a.first)); // Tie-breaking by b, g, r
     });
 
+    // Collect least frequent colors
     std::vector<std::tuple<T, T, T>> removed_pixels;
     for (int i = 0; i < n && i < colorFreq.size(); ++i) {
         removed_pixels.push_back(colorFreq[i].first);
     }
 
+    // Map to replace least frequent colors with closest colors
     std::unordered_map<std::tuple<T, T, T>, std::tuple<T, T, T>> replacementMap;
     for (const auto& pixel : removed_pixels) {
         double minDistance = std::numeric_limits<double>::max();
@@ -67,12 +69,14 @@ void removeLFCsoa(RGB<T>& image, int n) {
     // Replace pixels in the original image
     for (size_t i = 0; i < image.r.size(); ++i) {
         auto color = getColor(image, i);
-        if (replacementMap.find(color) != replacementMap.end()) {
-            auto [r, g, b] = replacementMap[color];
+        auto it = replacementMap.find(color);
+        if (it != replacementMap.end()) {
+            auto [r, g, b] = it->second;
             image.r[i] = r;
             image.g[i] = g;
             image.b[i] = b;
         }
     }
 }
+
 
