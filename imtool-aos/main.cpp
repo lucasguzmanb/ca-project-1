@@ -1,6 +1,7 @@
 /* AOS */
 #include "common/binaryio.hpp"
 #include "common/progargs.hpp"
+#include "imgaos/cutfreq.hpp"
 #include "imgaos/imageaos.hpp"
 #include "imgaos/maxlevel.hpp"
 #include "imgaos/resize.hpp"
@@ -59,7 +60,15 @@ int main(int const argc, char * argv[]) {
     if (isInputUint8) {
       outputPixels =
           resize<uint8_t>(std::get<std::vector<Pixel<uint8_t>>>(inputPixels), metadata, args.extra);
-    } else {
+    } else if (args.operation == "cutfreq") {
+      outputPixels = inputPixels;
+      if (isInputUint8) {
+        removeLFCaos<uint8_t>(std::get<std::vector<Pixel<uint8_t>>>(outputPixels), args.extra[0]);
+      } else {
+        removeLFCaos<uint16_t>(std::get<std::vector<Pixel<uint16_t>>>(outputPixels), args.extra[0]);
+      }
+    }
+  }else {
       outputPixels = resize<uint16_t>(std::get<std::vector<Pixel<uint16_t>>>(inputPixels), metadata,
                                       args.extra);
     }

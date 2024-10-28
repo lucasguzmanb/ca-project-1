@@ -2,8 +2,10 @@
 #define CUTFREQ_HPP
 #include "imageaos.hpp"
 
-#include <unordered_map>
+#include <algorithm>
+#include <bits/ranges_algo.h>
 #include <cmath>
+#include <unordered_map>
 
 template <typename T>
 struct Pixel_map {
