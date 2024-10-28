@@ -18,9 +18,9 @@ ImageSOA<T> resize(ImageSOA<T> pixels, Metadata metadata, std::vector<int> size)
     // Define the new dimensions
     int newWidth = size[0], newHeight = size[1];
     ImageSOA<T> newPixels;
-    newPixels.r.resize(static_cast<size_t>(newWidth) * newHeight);
-    newPixels.g.resize(static_cast<size_t>(newWidth) * newHeight);
-    newPixels.b.resize(static_cast<size_t>(newWidth) * newHeight);
+    newPixels.r.resize(static_cast<size_t>(newWidth * newHeight));
+    newPixels.g.resize(static_cast<size_t>(newWidth * newHeight));
+    newPixels.b.resize(static_cast<size_t>(newWidth * newHeight));
 
 
     T c1, c2;
