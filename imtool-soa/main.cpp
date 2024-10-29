@@ -4,6 +4,7 @@
 #include "../common/progargs.hpp"
 #include "../imgsoa/imagesoa.hpp"
 #include "../imgsoa/resize.hpp"
+#include "common/info.hpp"
 #include "imgsoa/maxlevel.hpp"
 
 #include <fstream>
@@ -20,12 +21,7 @@ int main(int const argc, char * argv[]) {
   Arguments const args                       = checkAndParseArgs(args_vector);
 
   // open input file
-  std::ifstream inputFile(args.input, std::ios::binary);
-  // check if file exists or can be opened
-  if (!inputFile.is_open()) {
-    std::cerr << "Error: can't open file " << args.input << '\n';
-    exit(-1);
-  }
+  std::ifstream inputFile = openInputFile(args.input);
 
   Metadata const metadata = obtainMetadata(inputFile);
   Metadata newMetadata    = metadata;
@@ -33,6 +29,11 @@ int main(int const argc, char * argv[]) {
   if (metadata.format != "P6") {
     std::cerr << "Error: file is not in .ppm format\n";
     exit(-1);
+  }
+
+  if (args.operation == "info") {
+    info(args, metadata);
+    return 0;
   }
 
   constexpr int THRESHOLD = 255;
@@ -47,9 +48,7 @@ int main(int const argc, char * argv[]) {
   }
   // perform requested operation (8 or 16 bits)
   std::variant<ImageSOA<uint8_t>, ImageSOA<uint16_t>> outputPixels;
-  if (args.operation == "info") {
-    std::cout << "info\n";
-  } else if (args.operation == "maxlevel") {
+  if (args.operation == "maxlevel") {
     if (isInputUint8) {
       outputPixels = maxlevel<uint8_t>(std::get<ImageSOA<uint8_t>>(inputPixels),
                                        metadata.maxColorValue, args.extra[0]);
@@ -86,13 +85,9 @@ int main(int const argc, char * argv[]) {
     exit(-1);
   }
 
-  // open output file
-  std::ofstream outputFile(args.output, std::ios::binary);
-  // check if file can be created
-  if (!outputFile.is_open()) {
-    std::cerr << "Error: can't create file " << args.output << '\n';
-    exit(-1);
-  }
+  /// open output file
+  std::ofstream outputFile = openOutputFile(args.output);
+
   // write metadata
   outputFile << newMetadata.format << '\n'
              << newMetadata.width << ' ' << newMetadata.height << '\n'
@@ -105,7 +100,8 @@ int main(int const argc, char * argv[]) {
   } else if (std::holds_alternative<ImageSOA<uint16_t>>(outputPixels)) {
     SOAToBinary<uint16_t>(outputFile, std::get<ImageSOA<uint16_t>>(outputPixels));
   } else {
-    // Handle error or unexpected variant type
+    std::cerr << "Error: unknown variant type\n";
+    exit(-1);
   }
 
   inputFile.close();

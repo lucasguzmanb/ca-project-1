@@ -13,6 +13,9 @@ struct Metadata {
 
 Metadata obtainMetadata(std::ifstream & inputFile);
 
+std::ifstream openInputFile(std::string const & fileName);
+std::ofstream openOutputFile(std::string const & fileName);
+
 template <typename T>
 T readBinary(std::istream & input) {
     T value;

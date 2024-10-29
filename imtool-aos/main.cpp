@@ -1,6 +1,7 @@
 /* AOS */
 
 #include "common/binaryio.hpp"
+#include "common/info.hpp"
 #include "common/progargs.hpp"
 #include "imgaos/cutfreq.hpp"
 #include "imgaos/imageaos.hpp"
@@ -17,22 +18,22 @@ int main(int const argc, char * argv[]) {
   check_minimum_args(argc);
   std::span const args_view(argv + 1, static_cast<std::size_t>(argc - 1));
   std::vector<std::string> const args_vector = {args_view.begin(), args_view.end()};
-  Arguments const args = checkAndParseArgs(args_vector);
+  Arguments const args                       = checkAndParseArgs(args_vector);
 
   // open input file
-  std::ifstream inputFile(args.input, std::ios::binary);
-  // check if file exists or can be opened
-  if (!inputFile.is_open()) {
-    std::cerr << "Error: can't open file " << args.input << '\n';
-    exit(-1);
-  }
+  std::ifstream inputFile = openInputFile(args.input);
 
   Metadata const metadata = obtainMetadata(inputFile);
-  Metadata newMetadata = metadata;
+  Metadata newMetadata    = metadata;
   // check if file is in P6 format
   if (metadata.format != "P6") {
     std::cerr << "Error: file is not in .ppm format\n";
     exit(-1);
+  }
+
+  if (args.operation == "info") {
+    info(args, metadata);
+    return 0;
   }
 
   constexpr int THRESHOLD = 255;
@@ -47,9 +48,7 @@ int main(int const argc, char * argv[]) {
   }
   // perform requested operation (8 or 16 bits)
   std::variant<std::vector<Pixel<uint8_t>>, std::vector<Pixel<uint16_t>>> outputPixels;
-  if (args.operation == "info") {
-    std::cout << "info\n";
-  } else if (args.operation == "maxlevel") {
+  if (args.operation == "maxlevel") {
     if (isInputUint8) {
       outputPixels = maxlevel<uint8_t>(std::get<std::vector<Pixel<uint8_t>>>(inputPixels),
                                        metadata.maxColorValue, args.extra[0]);
@@ -87,12 +86,8 @@ int main(int const argc, char * argv[]) {
   }
 
   // open output file
-  std::ofstream outputFile(args.output, std::ios::binary);
-  // check if file can be created
-  if (!outputFile.is_open()) {
-    std::cerr << "Error: can't create file " << args.output << '\n';
-    exit(-1);
-  }
+  std::ofstream outputFile = openOutputFile(args.output);
+
   // write metadata
   outputFile << newMetadata.format << '\n'
              << newMetadata.width << ' ' << newMetadata.height << '\n'
@@ -107,6 +102,7 @@ int main(int const argc, char * argv[]) {
                           newMetadata.width, newMetadata.height);
   } else {
     std::cerr << "Error: unknown variant type\n";
+    exit(-1);
   }
 
   inputFile.close();

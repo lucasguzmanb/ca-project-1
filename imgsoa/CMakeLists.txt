@@ -8,8 +8,6 @@ add_library(imgsoa
         maxlevel.hpp
         resize.cpp
         resize.hpp
-        info.cpp
-        info.hpp
         compress.cpp
         compress.hpp
 )
