@@ -9,6 +9,7 @@
 #include <iostream>
 #include <span>
 #include <vector>
+#include <variant>
 
 int main(int const argc, char * argv[]) {
   // check & parse arguments
