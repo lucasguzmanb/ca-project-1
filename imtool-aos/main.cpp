@@ -47,8 +47,9 @@ int main(int const argc, char * argv[]) {
   }
   // perform requested operation (8 or 16 bits)
   std::variant<std::vector<Pixel<uint8_t>>, std::vector<Pixel<uint16_t>>> outputPixels;
-
-  if (args.operation == "maxlevel") {
+  if (args.operation == "info") {
+    std::cout << "info\n";
+  } else if (args.operation == "maxlevel") {
     if (isInputUint8) {
       outputPixels = maxlevel<uint8_t>(std::get<std::vector<Pixel<uint8_t>>>(inputPixels),
                                        metadata.maxColorValue, args.extra[0]);
@@ -60,20 +61,25 @@ int main(int const argc, char * argv[]) {
     if (isInputUint8) {
       outputPixels =
           resize<uint8_t>(std::get<std::vector<Pixel<uint8_t>>>(inputPixels), metadata, args.extra);
-    } else if (args.operation == "cutfreq") {
-      outputPixels = inputPixels;
-      if (isInputUint8) {
-        removeLFCaos<uint8_t>(std::get<std::vector<Pixel<uint8_t>>>(outputPixels), args.extra[0]);
-      } else {
-        removeLFCaos<uint16_t>(std::get<std::vector<Pixel<uint16_t>>>(outputPixels), args.extra[0]);
-      }
-    }
-  }else {
+    } else {
       outputPixels = resize<uint16_t>(std::get<std::vector<Pixel<uint16_t>>>(inputPixels), metadata,
                                       args.extra);
     }
     metadata.width  = args.extra[0];
     metadata.height = args.extra[1];
+  } else if (args.operation == "cutfreq") {
+    outputPixels = inputPixels;
+    if (isInputUint8) {
+      removeLFCaos<uint8_t>(std::get<std::vector<Pixel<uint8_t>>>(outputPixels), args.extra[0]);
+    } else {
+      removeLFCaos<uint16_t>(std::get<std::vector<Pixel<uint16_t>>>(outputPixels), args.extra[0]);
+    }
+  } else if (args.operation == "compress") {
+    if (isInputUint8) {
+      std::cout << "compress8\n";
+    } else {
+      std::cout << "compress16\n";
+    }
   } else {
     std::cerr << "Error: unknown operation\n";
     exit(-1);

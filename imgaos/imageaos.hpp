@@ -1,18 +1,29 @@
 /* Library for support for image processing with AOS */
 #ifndef IMAGEAOS_HPP
 #define IMAGEAOS_HPP
-#include <common/binaryio.hpp>
+
+#include "common/binaryio.hpp"
+
 #include <cstddef>
 #include <fstream>
+#include <iostream>
 #include <tuple>
+#include <variant>
 #include <vector>
 
 template <typename T>
 struct Pixel {
     T r, g, b;
 
-  bool operator==(const Pixel<T>& other) const {
-    return std::tie(r, g, b) == std::tie(other.r, other.g, other.b);
+    bool operator==(Pixel<T> const & other) const {
+      return std::tie(r, g, b) == std::tie(other.r, other.g, other.b);
+    }
+};
+
+template <typename T>
+struct Pixel_map {
+  std::size_t operator()(Pixel<T> const & color) const {
+    return std::hash<T>{}(color.r) ^ std::hash<T>{}(color.g) ^ std::hash<T>{}(color.b);
   }
 };
 
@@ -38,4 +49,5 @@ void AOSToBinary(std::ofstream & outputFile, std::vector<Pixel<T>> const & data,
     writeBinary(outputFile, data[i].b);
   }
 }
+
 #endif  // IMAGEAOS_HPP
