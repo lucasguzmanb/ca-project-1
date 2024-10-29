@@ -1,10 +1,11 @@
 #ifndef RESIZE_HPP
 #define RESIZE_HPP
 
+#include "imageaos.hpp"
+
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "imageaos.hpp"
 
 // Function for pixel interpolation
 template <typename T>

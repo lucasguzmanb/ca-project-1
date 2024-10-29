@@ -1,16 +1,14 @@
-#ifndef CUTFREQ_HPP
-#define CUTFREQ_HPP
+#ifndef CUTFREQ_AOS_HPP
+#define CUTFREQ_AOS_HPP
+
 #include "imageaos.hpp"
 
-#include <unordered_map>
+#include <algorithm>
+#include <bits/ranges_algo.h>
 #include <cmath>
+#include <unordered_map>
 
-template <typename T>
-struct Pixel_map {
-    std::size_t operator()(Pixel<T> const & color) const {
-      return std::hash<T>{}(color.r) ^ std::hash<T>{}(color.g) ^ std::hash<T>{}(color.b);
-    }
-};
+
 
 template <typename T>
 double euclideanDistance(Pixel<T> const & first, Pixel<T> const & second) {
@@ -23,7 +21,7 @@ void removeLFCaos(std::vector<Pixel<T>> & pixels, int n) {
   std::unordered_map<Pixel<T>, int, Pixel_map<T>> frequency;
 
   // Calculate frequency of each color
-  for (auto const & pixel : pixels) { frequency[pixel]++; }
+  for (auto const & pixel : pixels) { ++frequency[pixel]; }
 
   // Create a vector of color frequencies
   std::vector<std::pair<Pixel<T>, int>> colorFreq(frequency.begin(), frequency.end());
@@ -69,4 +67,4 @@ void removeLFCaos(std::vector<Pixel<T>> & pixels, int n) {
   }
 }
 
-#endif  // CUTFREQ_HPP
+#endif  // CUTFREQ_AOS_HPP

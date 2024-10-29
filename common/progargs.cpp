@@ -87,3 +87,10 @@ void check_args(Arguments const & args) {
     exit(-1);
   }
 }
+
+Arguments checkAndParseArgs(const std::vector<std::string>& args_vector) {
+  Arguments args = parse_args(args_vector);
+  check_args(args);
+  print_arguments(args);
+  return args;
+}

@@ -20,5 +20,7 @@ Arguments parse_args(std::vector<std::string> const & argv);
 
 void check_args(Arguments const & args);
 
+Arguments checkAndParseArgs(const std::vector<std::string>& args_vector);
+
 
 #endif // PROGARGS_HPP
