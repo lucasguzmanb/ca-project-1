@@ -9,6 +9,8 @@
 template <typename T>
 struct ImageSOA {
     std::vector<T> r, g, b;
+
+    explicit ImageSOA(size_t size = 0) : r(size), g(size), b(size) {}
 };
 
 template <typename T>

@@ -3,7 +3,6 @@
 
 #include "imageaos.hpp"
 
-#include <cmath>
 #include <cstdint>
 #include <variant>
 #include <vector>
@@ -11,34 +10,40 @@
 template <typename T>
 std::variant<std::vector<Pixel<uint8_t>>, std::vector<Pixel<uint16_t>>>
     maxlevel(std::vector<Pixel<T>> inputImage, int const oldLevel, int const newLevel) {
-
-  const float transformation = static_cast<float>(newLevel) / static_cast<float>(oldLevel);
-
-  if (constexpr int THRESHOLD = 255; newLevel <= THRESHOLD) { return maxlevel8<T>(inputImage, transformation); }
-  return maxlevel16<T>(inputImage, transformation);
+  if (constexpr int THRESHOLD = 255; newLevel <= THRESHOLD) {
+    return maxlevel8<T>(inputImage, oldLevel, newLevel);
+  }
+  return maxlevel16<T>(inputImage, oldLevel, newLevel);
 }
 
 template <typename T>
-std::vector<Pixel<uint8_t>> maxlevel8(std::vector<Pixel<T>> const & inputImage,
-                                      float const transformation) {
+std::vector<Pixel<uint8_t>> maxlevel8(std::vector<Pixel<T>> const & inputImage, int const oldLevel,
+                                      int const newLevel) {
   std::vector<Pixel<uint8_t>> outputImage(inputImage.size());
   for (size_t i = 0; i < inputImage.size(); ++i) {
-    outputImage[i].r = static_cast<uint8_t>(std::round(inputImage[i].r * transformation));
-    outputImage[i].g = static_cast<uint8_t>(std::round(inputImage[i].g * transformation));
-    outputImage[i].b = static_cast<uint8_t>(std::round(inputImage[i].b * transformation));
+    outputImage[i].r =
+        static_cast<uint8_t>((inputImage[i].r * newLevel + oldLevel / 2) / oldLevel);
+    outputImage[i].g =
+        static_cast<uint8_t>((inputImage[i].g * newLevel + oldLevel / 2) / oldLevel);
+    outputImage[i].b =
+        static_cast<uint8_t>((inputImage[i].b * newLevel + oldLevel / 2) / oldLevel);
   }
   return outputImage;
 }
 
 template <typename T>
 std::vector<Pixel<uint16_t>> maxlevel16(std::vector<Pixel<T>> const & inputImage,
-                                        float const transformation) {
+                                        int const oldLevel, int const newLevel) {
   std::vector<Pixel<uint16_t>> outputImage(inputImage.size());
   for (size_t i = 0; i < inputImage.size(); ++i) {
-    outputImage[i].r = static_cast<uint16_t>(std::round(inputImage[i].r * transformation));
-    outputImage[i].g = static_cast<uint16_t>(std::round(inputImage[i].g * transformation));
-    outputImage[i].b = static_cast<uint16_t>(std::round(inputImage[i].b * transformation));
+    outputImage[i].r =
+        static_cast<uint16_t>((inputImage[i].r * newLevel + oldLevel / 2) / oldLevel);
+    outputImage[i].g =
+        static_cast<uint16_t>((inputImage[i].g * newLevel + oldLevel / 2) / oldLevel);
+    outputImage[i].b =
+        static_cast<uint16_t>((inputImage[i].b * newLevel + oldLevel / 2) / oldLevel);
   }
   return outputImage;
 }
+
 #endif  // MAXLEVEL_AOS_HPP

@@ -96,7 +96,6 @@ int main(int const argc, char * argv[]) {
   // write binary data
   if (std::holds_alternative<ImageSOA<uint8_t>>(outputPixels)) {
     SOAToBinary<uint8_t>(outputFile, std::get<ImageSOA<uint8_t>>(outputPixels));
-
   } else if (std::holds_alternative<ImageSOA<uint16_t>>(outputPixels)) {
     SOAToBinary<uint16_t>(outputFile, std::get<ImageSOA<uint16_t>>(outputPixels));
   } else {
