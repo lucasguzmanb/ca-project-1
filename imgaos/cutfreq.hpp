@@ -49,10 +49,10 @@ void removeLFCaos(std::vector<Pixel<T>> & pixels, int n) {
     double minDistance    = std::numeric_limits<double>::max();
     Pixel<T> closestColor = pixel;  // Start with the same color
 
-    for (const auto& remainingColor : remainingColors) {
-      double distanceSquared = euclideanDistanceSquared(pixel, remainingColor);
-      if (distanceSquared < minDistance && pixel != remainingColor) {
-        minDistance = distanceSquared;
+    for (auto const & remainingColor : remainingColors) {
+      double distance = euclideanDistance(pixel, remainingColor);
+      if (distance < minDistance && pixel != remainingColor) {
+        minDistance  = distance;
         closestColor = remainingColor;
       }
     }
