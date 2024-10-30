@@ -2,21 +2,17 @@
 #include "compress.hpp"
 #include <fstream>
 #include <iostream>
-
-//hay q delcarar color max???
-
-// leer la file??
+//otros includes??
 
 CCompress::CCompress(const std::string& outputFilePath) : outputFilePath(outputFilePath) {}
 
 //{
-void CCompress::compress(const std::vector<Pixel<uint8_t>(inputPixels),metadata.maxColorValue, args.extra[0]) {
+void CCompress::compress(const std::vector<Pixel,uint8_t>(inputPixels), metadata.maxColorValue, args.extra[0]) {
     //initialize values of width, height and colormax
     maxColorValue = metadata.maxColorValue;
     getpixels(inputPixels);
     std::map<Color, uint16_t>colorMap = getcolours(inputPixels, n_colors);
     write_data(outputFile, colorMap, maxColorValue);
-
 
 }
 
@@ -37,10 +33,17 @@ void getpixels(const inputFile){
   }
 }
 
-std:: map<Color, uint16_> getcolours(const std::vector<Pixel<uint8_t>(inputPixels),metadata.maxColorValue, args.extra[0]) {
+std:: map<Color, uint16_> getcolours(const std::vector<Pixel,uint8_t>(inputPixels),metadata.maxColorValue, args.extra[0]) {
   std::map<Color, uint16_> colours;
-
+  for (cons //iterate through colours input inputfile){
+  	if (colours.find(Color(0, 0, 0)) != colours.end()) {
+    	tablecolours[color] = n_colours + 1;
+        n_colours++;
+    }
+  }
 }
+
+
 void CCompress::writeCompressedData(outputFile, const std::map<Color, uint16_>& colorMap, n_colors) {
 	int limitvalue = 255;
     int limitvalue2 = 65535;
