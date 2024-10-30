@@ -1,5 +1,6 @@
 #include "binaryio.hpp"
 
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 
@@ -11,7 +12,7 @@ Metadata obtainMetadata(std::ifstream & inputFile) {
   return metadata;
 }
 
-std::ifstream openInputFile(std::string const & fileName) {
+std::ifstream openInputFile(std::filesystem::path const & fileName) {
   std::ifstream inputFile(fileName, std::ios::binary);
   // check if file can be opened
   if (!inputFile.is_open()) {
@@ -21,7 +22,7 @@ std::ifstream openInputFile(std::string const & fileName) {
   return inputFile;
 }
 
-std::ofstream openOutputFile(std::string const & fileName) {
+std::ofstream openOutputFile(std::filesystem::path const & fileName) {
   std::ofstream outputFile(fileName, std::ios::binary);
   // check if file can be opened
   if (!outputFile.is_open()) {

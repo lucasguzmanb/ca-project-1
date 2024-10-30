@@ -1,8 +1,9 @@
 #ifndef BINARYIO_HPP
 #define BINARYIO_HPP
 
-#include <string>
+#include <filesystem>
 #include <fstream>
+#include <string>
 
 struct Metadata {
     std::string format;
@@ -13,8 +14,8 @@ struct Metadata {
 
 Metadata obtainMetadata(std::ifstream & inputFile);
 
-std::ifstream openInputFile(std::string const & fileName);
-std::ofstream openOutputFile(std::string const & fileName);
+std::ifstream openInputFile(std::filesystem::path const & fileName);
+std::ofstream openOutputFile(std::filesystem::path const & fileName);
 
 template <typename T>
 T readBinary(std::istream & input) {
