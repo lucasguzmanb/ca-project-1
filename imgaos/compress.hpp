@@ -20,6 +20,4 @@ class CCompress {
   void writeCompressedData(const std::vector<uint8_t>& compressedData);
 };
 
-#endif // CCOMPRESS_HPP
-
 #endif //COMPRESS_HPP
