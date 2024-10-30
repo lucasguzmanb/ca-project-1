@@ -31,3 +31,9 @@ std::ofstream openOutputFile(std::filesystem::path const & fileName) {
   }
   return outputFile;
 }
+
+void writeMetadata(std::ofstream & outputFile, Metadata const & metadata) {
+  outputFile << metadata.format << '\n'
+             << metadata.width << ' ' << metadata.height << '\n'
+             << metadata.maxColorValue << '\n';
+}

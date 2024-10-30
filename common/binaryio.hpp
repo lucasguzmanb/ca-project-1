@@ -17,6 +17,8 @@ Metadata obtainMetadata(std::ifstream & inputFile);
 std::ifstream openInputFile(std::filesystem::path const & fileName);
 std::ofstream openOutputFile(std::filesystem::path const & fileName);
 
+void writeMetadata(std::ofstream & outputFile, Metadata const & metadata);
+
 template <typename T>
 T readBinary(std::istream & input) {
     T value;

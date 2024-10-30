@@ -89,9 +89,7 @@ int main(int const argc, char * argv[]) {
   std::ofstream outputFile = openOutputFile(args.output);
 
   // write metadata
-  outputFile << newMetadata.format << '\n'
-             << newMetadata.width << ' ' << newMetadata.height << '\n'
-             << newMetadata.maxColorValue << '\n';
+  writeMetadata(outputFile, newMetadata);
 
   // write binary data
   if (std::holds_alternative<ImageSOA<uint8_t>>(outputPixels)) {
