@@ -25,51 +25,42 @@ void removeLFCaos(std::vector<Pixel<T>> & pixels, int n) {
     ++frequency[pixel];
   }
 
-  // Use a priority queue to find the least frequent colors
-  using FrequencyPair = std::pair<int, Pixel<T>>;
-  auto compare = [](const FrequencyPair &a, const FrequencyPair &b) {
-    return a.first > b.first;  // Min-heap based on frequency
-  };
-  std::priority_queue<FrequencyPair, std::vector<FrequencyPair>, decltype(compare)> minHeap(compare);
-
-  for (const auto &entry : frequency) {
-    minHeap.emplace(entry.second, entry.first);
+  // Use partial sorting to get the n least frequent colors
+  std::vector<std::pair<int, Pixel<T>>> frequencyVec;
+  for (const auto& entry : frequency) {
+    frequencyVec.emplace_back(entry.second, entry.first);
   }
 
-  // Collect least frequent colors
-  std::vector<Pixel<T>> removed_pixels;
-  while (removed_pixels.size() < static_cast<size_t>(n) && !minHeap.empty()) {
-    removed_pixels.push_back(minHeap.top().second);
-    minHeap.pop();
+  // Sort only up to the n least frequent colors
+  std::partial_sort(frequencyVec.begin(), frequencyVec.begin() + n, frequencyVec.end());
+
+  // Collect least frequent colors and prepare remaining colors
+  std::vector<Pixel<T>> removed_pixels, remainingColors;
+  for (size_t i = 0; i < frequencyVec.size(); ++i) {
+    if (i < static_cast<size_t>(n)) {
+      removed_pixels.push_back(frequencyVec[i].second);
+    } else {
+      remainingColors.push_back(frequencyVec[i].second);
+    }
   }
+
 
   // Create a replacement map for the least frequent colors
   std::unordered_map<Pixel<T>, Pixel<T>, Pixel_map<T>> replacementMap;
-  std::vector<Pixel<T>> remainingColors;
 
-  for (const auto &entry : frequency) {
-    if (std::find(removed_pixels.begin(), removed_pixels.end(), entry.first) == removed_pixels.end()) {
-      remainingColors.push_back(entry.first);
-    }
-  }
-
-  for (const auto &pixel : removed_pixels) {
+  // Find nearest color for each removed pixel
+  for (const auto& pixel : removed_pixels) {
     double minDistance = std::numeric_limits<double>::max();
-    Pixel<T> closestColor = pixel;  // Start with the same color
+    Pixel<T> closestColor = pixel;  // Default to itself in case of no better match
 
-    for (const auto &remainingColor : remainingColors) {
-      double distance = euclideanDistance(pixel, remainingColor);
-      if (distance < minDistance && pixel != remainingColor) {
-        minDistance = distance;
+    for (const auto& remainingColor : remainingColors) {
+      double distanceSquared = euclideanDistanceSquared(pixel, remainingColor);
+      if (distanceSquared < minDistance && pixel != remainingColor) {
+        minDistance = distanceSquared;
         closestColor = remainingColor;
-
       }
     }
-
-    if (closestColor != pixel) {
-      // Ensure it's different before adding
-      replacementMap[pixel] = closestColor;
-    }
+    replacementMap[pixel] = closestColor;
   }
   // Replace pixels in the original image
   for (auto &pixel : pixels) {
