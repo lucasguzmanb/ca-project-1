@@ -11,7 +11,7 @@ void CCompress::compress(const std::vector<Pixel,uint8_t>(inputPixels), metadata
     //initialize values of width, height and colormax
     maxColorValue = metadata.maxColorValue;
     getpixels(inputPixels);
-    std::map<Color, uint16_t>colorMap = getcolours(inputPixels, n_colors);
+    std::map<Color, uint16_t>colorMap = getcolors(inputPixels, n_colors);
     write_data(outputFile, colorMap, maxColorValue);
 
 }
@@ -33,7 +33,7 @@ void getpixels(const inputFile){
   }
 }
 
-std:: map<Color, uint16_> getcolours(const std::vector<Pixel,uint8_t>(inputPixels),metadata.maxColorValue, args.extra[0]) {
+std:: map<Color, uint16_> getcolors(const std::vector<Pixel,uint8_t>(inputPixels),metadata.maxColorValue, args.extra[0]) {
   std::map<Color, uint16_> colours;
   for (cons //iterate through colours input inputfile){
   	if (colours.find(Color(0, 0, 0)) != colours.end()) {
