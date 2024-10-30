@@ -7,7 +7,7 @@
 #include <bits/ranges_algo.h>
 #include <cmath>
 #include <unordered_map>
-
+#include <queue>
 
 
 template <typename T>
@@ -21,50 +21,66 @@ void removeLFCaos(std::vector<Pixel<T>> & pixels, int n) {
   std::unordered_map<Pixel<T>, int, Pixel_map<T>> frequency;
 
   // Calculate frequency of each color
-  for (auto const & pixel : pixels) { ++frequency[pixel]; }
+  for (const auto & pixel : pixels) {
+    ++frequency[pixel];
+  }
 
-  // Create a vector of color frequencies
-  std::vector<std::pair<Pixel<T>, int>> colorFreq(frequency.begin(), frequency.end());
-  std::sort(colorFreq.begin(), colorFreq.end(), [](auto const & a, auto const & b) {
-    if (a.second != b.second) {
-      return a.second < b.second;  // Sort by frequency
-    }
-    return std::tie(b.first.b, b.first.g, b.first.r) <
-           std::tie(a.first.b, a.first.g, a.first.r);  // Tie-breaking by b, g, r
-  });
+  // Use a priority queue to find the least frequent colors
+  using FrequencyPair = std::pair<int, Pixel<T>>;
+  auto compare = [](const FrequencyPair &a, const FrequencyPair &b) {
+    return a.first > b.first;  // Min-heap based on frequency
+  };
+  std::priority_queue<FrequencyPair, std::vector<FrequencyPair>, decltype(compare)> minHeap(compare);
+
+  for (const auto &entry : frequency) {
+    minHeap.emplace(entry.second, entry.first);
+  }
 
   // Collect least frequent colors
   std::vector<Pixel<T>> removed_pixels;
-  for (size_t i = 0; i < static_cast<size_t>(n) && i < colorFreq.size(); i++) {
-    removed_pixels.push_back(colorFreq[i].first);
+  while (removed_pixels.size() < static_cast<size_t>(n) && !minHeap.empty()) {
+    removed_pixels.push_back(minHeap.top().second);
+    minHeap.pop();
   }
 
-  // Map to replace the least frequent colors with the closest colors
+  // Create a replacement map for the least frequent colors
   std::unordered_map<Pixel<T>, Pixel<T>, Pixel_map<T>> replacementMap;
-  for (auto const & pixel : removed_pixels) {
-    double minDistance    = std::numeric_limits<double>::max();
-    Pixel<T> closestColor = pixel;
+  std::vector<Pixel<T>> remainingColors;
 
-    for (auto const & [remainingColor, freq] : colorFreq) {
-      if (std::find(removed_pixels.begin(), removed_pixels.end(), remainingColor) ==
-          removed_pixels.end()) {
-        double distance = euclideanDistance(pixel, remainingColor);
-        if (distance < minDistance) {
-          minDistance  = distance;
-          closestColor = remainingColor;
-        }
+  for (const auto &entry : frequency) {
+    if (std::find(removed_pixels.begin(), removed_pixels.end(), entry.first) == removed_pixels.end()) {
+      remainingColors.push_back(entry.first);
+    }
+  }
+
+  for (const auto &pixel : removed_pixels) {
+    double minDistance = std::numeric_limits<double>::max();
+    Pixel<T> closestColor = pixel;  // Start with the same color
+
+    for (const auto &remainingColor : remainingColors) {
+      double distance = euclideanDistance(pixel, remainingColor);
+      if (distance < minDistance && pixel != remainingColor) {
+        minDistance = distance;
+        closestColor = remainingColor;
+
       }
     }
-    replacementMap[pixel] = closestColor;
-  }
 
+    if (closestColor != pixel) {
+      // Ensure it's different before adding
+      replacementMap[pixel] = closestColor;
+    }
+  }
   // Replace pixels in the original image
-  for (auto & pixel : pixels) {
+  for (auto &pixel : pixels) {
     auto it = replacementMap.find(pixel);
     if (it != replacementMap.end()) {
       pixel = it->second;  // Update pixel color
+
     }
   }
 }
+
+
 
 #endif  // CUTFREQ_AOS_HPP
