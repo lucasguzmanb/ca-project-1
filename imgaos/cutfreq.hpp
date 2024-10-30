@@ -6,9 +6,8 @@
 #include <algorithm>
 #include <bits/ranges_algo.h>
 #include <cmath>
-#include <unordered_map>
 #include <queue>
-
+#include <unordered_map>
 
 template <typename T>
 double euclideanDistance(Pixel<T> const & first, Pixel<T> const & second) {
@@ -16,42 +15,39 @@ double euclideanDistance(Pixel<T> const & first, Pixel<T> const & second) {
                    std::pow(first.b - second.b, 2));
 }
 
+// Custom comparator for a pair of Pixel<T> and int
+template <typename T>
+bool comparePair(std::pair<Pixel<T>, int> const & pair1, std::pair<Pixel<T>, int> & pair2) {
+  return pair1.second < pair2.second;
+}
+
 template <typename T>
 void removeLFCaos(std::vector<Pixel<T>> & pixels, int n) {
   std::unordered_map<Pixel<T>, int, Pixel_map<T>> frequency;
 
   // Calculate frequency of each color
-  for (const auto & pixel : pixels) {
-    ++frequency[pixel];
-  }
+  for (auto const & pixel : pixels) { ++frequency[pixel]; }
 
-  // Use partial sorting to get the n least frequent colors
-  std::vector<std::pair<int, Pixel<T>>> frequencyVec;
-  for (const auto& entry : frequency) {
-    frequencyVec.emplace_back(entry.second, entry.first);
-  }
+  std::vector<std::pair<Pixel<T>, int>> frequencyVector(frequency.begin(), frequency.end());
+  std::partial_sort(frequencyVector.begin(), frequencyVector.begin() + n, frequencyVector.end(),
+                    comparePair<T>);
 
-  // Sort only up to the n least frequent colors
-  std::partial_sort(frequencyVec.begin(), frequencyVec.begin() + n, frequencyVec.end());
-
-  // Collect least frequent colors and prepare remaining colors
-  std::vector<Pixel<T>> removed_pixels, remainingColors;
-  for (size_t i = 0; i < frequencyVec.size(); ++i) {
+  // Divide colors in removed_pixels and remaining_colors
+  std::vector<Pixel<T>> removed_pixels;
+  std::vector<Pixel<T>> remainingColors;
+  for (size_t i = 0; i < frequencyVector.size(); ++i) {
     if (i < static_cast<size_t>(n)) {
-      removed_pixels.push_back(frequencyVec[i].second);
+      removed_pixels.push_back(frequencyVector[i].first);
     } else {
-      remainingColors.push_back(frequencyVec[i].second);
+      remainingColors.push_back(frequencyVector[i].first);
     }
   }
 
-
-  // Create a replacement map for the least frequent colors
   std::unordered_map<Pixel<T>, Pixel<T>, Pixel_map<T>> replacementMap;
 
-  // Find nearest color for each removed pixel
-  for (const auto& pixel : removed_pixels) {
-    double minDistance = std::numeric_limits<double>::max();
-    Pixel<T> closestColor = pixel;  // Default to itself in case of no better match
+  for (auto const & pixel : removed_pixels) {
+    double minDistance    = std::numeric_limits<double>::max();
+    Pixel<T> closestColor = pixel;  // Start with the same color
 
     for (const auto& remainingColor : remainingColors) {
       double distanceSquared = euclideanDistanceSquared(pixel, remainingColor);
@@ -63,15 +59,12 @@ void removeLFCaos(std::vector<Pixel<T>> & pixels, int n) {
     replacementMap[pixel] = closestColor;
   }
   // Replace pixels in the original image
-  for (auto &pixel : pixels) {
-    auto it = replacementMap.find(pixel);
-    if (it != replacementMap.end()) {
-      pixel = it->second;  // Update pixel color
-
+  for (auto & pixel : pixels) {
+    auto newPixel = replacementMap.find(pixel);
+    if (newPixel != replacementMap.end()) {
+      pixel = newPixel->second;  // Update pixel color
     }
   }
 }
-
-
 
 #endif  // CUTFREQ_AOS_HPP
