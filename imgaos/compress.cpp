@@ -6,7 +6,7 @@
 
 CCompress::CCompress(const std::string& outputFilePath) : outputFilePath(outputFilePath) {}
 
-//{
+
 void CCompress::compress(const std::vector<Pixel<uint8_t>>(&inputPixels), maxColorValue) {
     //initialize values of width, height and colormax
     maxColorValue = metadata.maxColorValue;
