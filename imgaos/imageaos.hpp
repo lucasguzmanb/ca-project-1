@@ -20,11 +20,15 @@ struct Pixel {
     }
 };
 
+void writeBinaryData(
+    std::ofstream & outputFile,
+    std::variant<std::vector<Pixel<uint8_t>>, std::vector<Pixel<uint16_t>>> const & outputPixels);
+
 template <typename T>
 struct Pixel_map {
-  std::size_t operator()(Pixel<T> const & color) const {
-    return std::hash<T>{}(color.r) ^ std::hash<T>{}(color.g) ^ std::hash<T>{}(color.b);
-  }
+    std::size_t operator()(Pixel<T> const & color) const {
+      return std::hash<T>{}(color.r) ^ std::hash<T>{}(color.g) ^ std::hash<T>{}(color.b);
+    }
 };
 
 template <typename T>
@@ -40,13 +44,11 @@ std::vector<Pixel<T>> binaryToAOS(std::ifstream & inputFile, int width, int heig
 }
 
 template <typename T>
-void AOSToBinary(std::ofstream & outputFile, std::vector<Pixel<T>> const & data, int const width,
-                 int const height) {
-  auto dataSize = static_cast<std::size_t>(width * height);
-  for (std::size_t i = 0; i < dataSize; ++i) {
-    writeBinary(outputFile, data[i].r);
-    writeBinary(outputFile, data[i].g);
-    writeBinary(outputFile, data[i].b);
+void AOSToBinary(std::ofstream & outputFile, std::vector<Pixel<T>> const & data) {
+  for (auto pixel : data) {
+    writeBinary(outputFile, pixel.r);
+    writeBinary(outputFile, pixel.g);
+    writeBinary(outputFile, pixel.b);
   }
 }
 

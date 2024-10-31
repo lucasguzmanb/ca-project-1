@@ -92,16 +92,7 @@ int main(int const argc, char * argv[]) {
   writeMetadata(outputFile, newMetadata);
 
   // write binary data
-  if (std::holds_alternative<std::vector<Pixel<uint8_t>>>(outputPixels)) {
-    AOSToBinary<uint8_t>(outputFile, std::get<std::vector<Pixel<uint8_t>>>(outputPixels),
-                         newMetadata.width, newMetadata.height);
-  } else if (std::holds_alternative<std::vector<Pixel<uint16_t>>>(outputPixels)) {
-    AOSToBinary<uint16_t>(outputFile, std::get<std::vector<Pixel<uint16_t>>>(outputPixels),
-                          newMetadata.width, newMetadata.height);
-  } else {
-    std::cerr << "Error: unknown variant type\n";
-    exit(-1);
-  }
+  writeBinaryData(outputFile, outputPixels);
 
   inputFile.close();
   outputFile.close();

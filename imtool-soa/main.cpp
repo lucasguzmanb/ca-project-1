@@ -92,14 +92,7 @@ int main(int const argc, char * argv[]) {
   writeMetadata(outputFile, newMetadata);
 
   // write binary data
-  if (std::holds_alternative<ImageSOA<uint8_t>>(outputPixels)) {
-    SOAToBinary<uint8_t>(outputFile, std::get<ImageSOA<uint8_t>>(outputPixels));
-  } else if (std::holds_alternative<ImageSOA<uint16_t>>(outputPixels)) {
-    SOAToBinary<uint16_t>(outputFile, std::get<ImageSOA<uint16_t>>(outputPixels));
-  } else {
-    std::cerr << "Error: unknown variant type\n";
-    exit(-1);
-  }
+  writeBinaryData(outputFile, outputPixels);
 
   inputFile.close();
   outputFile.close();

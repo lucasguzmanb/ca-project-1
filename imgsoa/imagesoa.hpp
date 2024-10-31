@@ -4,6 +4,7 @@
 #include "common/binaryio.hpp"
 
 #include <fstream>
+#include <variant>
 #include <vector>
 
 template <typename T>
@@ -12,6 +13,9 @@ struct ImageSOA {
 
     explicit ImageSOA(size_t size = 0) : r(size), g(size), b(size) {}
 };
+
+void writeBinaryData(std::ofstream & outputFile,
+                     std::variant<ImageSOA<uint8_t>, ImageSOA<uint16_t>> const & outputPixels);
 
 template <typename T>
 ImageSOA<T> binaryToSOA(std::ifstream & inputFile, int const width, int const height) {
