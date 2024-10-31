@@ -7,12 +7,12 @@
 CCompress::CCompress(const std::string& outputFilePath) : outputFilePath(outputFilePath) {}
 
 //{
-void CCompress::compress(const std::vector<Pixel<uint8_t>>(&inputPixels), maxColorValue, args.extra[0]) {
+void CCompress::compress(const std::vector<Pixel<uint8_t>>(&inputPixels), maxColorValue) {
     //initialize values of width, height and colormax
     maxColorValue = metadata.maxColorValue;
-    getpixels(inputPixels);
-    std::map<Color, uint16_t>&Pixel_map = getcolors(inputPixels, n_colors);
-    write_data(outputFile, Pixel_map, maxColorValue);
+    getpixels(&inputPixels);
+    std:: map<(Pixel<uint16_>), uint16_> pixelMap = getcolors(inputPixels, n_colors);
+    write_data(outputFile, pixelMap, maxColorValue);
 
 }
 
@@ -33,7 +33,7 @@ void getpixels(const inputFile){
   }
 }
 
-std:: map<Pixel<uint16_>> getcolors(const std::vector<Pixel<uint8_t>>(%inputPixels),maxColorValue) {
+std:: map<(Pixel<uint16_>), uint16_> getcolors(const std::vector<Pixel<uint8_t>>(%inputPixels),maxColorValue, n_colors) {
   std::map<Pixel, uint16_> Pixel_map;
    for (const auto& pixel : pixels) {
         // Check if the color is already in the map
@@ -46,10 +46,10 @@ std:: map<Pixel<uint16_>> getcolors(const std::vector<Pixel<uint8_t>>(%inputPixe
 }
 
 
-void CCompress::writeCompressedData(outputFile, const std::map<Color, uint16_>& colorMap, n_colors) {
+void CCompress::writeCompressedData(outputFile, const std::map<Color, uint16_>& pixelMap, n_colors) {
 	int limitvalue = 255;
     int limitvalue2 = 65535;
-    for (const [color: colorMap]{
+    for (const [pixel: pixelMap]{
     	if(maxColorValue < limitvalue) {
         	const r = static_cast<uint8_t>(color.r);
             const g = static_cast<uint8_t>(color.g);
@@ -65,13 +65,13 @@ void CCompress::writeCompressedData(outputFile, const std::map<Color, uint16_>& 
     }
     for (std::size_t i = 0; i < pixels.size; i++) {
     	if (n_colours <= limitvalue) {
-        	index = static_cast<uint8_t>(colorMap[i];
+        	index = static_cast<uint8_t>(Pixel_map[i];
 			binary::writeBinary(outputFile, index);
     	}else if ((n_colours >=limit1+1) && (n_colours <= limitvalue2)) {
-        	uint16_t index =colorMap[i];
+        	uint16_t index =Pixel_map[i];
             binary::writeBinary(outputFile, index);
         }else{
-          index = static_cast<uint32_t>(colorMap[i]);
+          index = static_cast<uint32_t>(Pixel_map[i]);
           binary::writeBinary(outputFile, index);
         }
     }
