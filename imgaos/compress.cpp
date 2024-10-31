@@ -7,12 +7,12 @@
 CCompress::CCompress(const std::string& outputFilePath) : outputFilePath(outputFilePath) {}
 
 //{
-void CCompress::compress(const std::vector<Pixel,uint8_t>(inputPixels), metadata.maxColorValue, args.extra[0]) {
+void CCompress::compress(const std::vector<Pixel<uint8_t>>(&inputPixels), maxColorValue, args.extra[0]) {
     //initialize values of width, height and colormax
     maxColorValue = metadata.maxColorValue;
     getpixels(inputPixels);
-    std::map<Color, uint16_t>colorMap = getcolors(inputPixels, n_colors);
-    write_data(outputFile, colorMap, maxColorValue);
+    std::map<Color, uint16_t>&Pixel_map = getcolors(inputPixels, n_colors);
+    write_data(outputFile, Pixel_map, maxColorValue);
 
 }
 
@@ -33,21 +33,23 @@ void getpixels(const inputFile){
   }
 }
 
-std:: map<Color, uint16_> getcolors(const std::vector<Pixel,uint8_t>(inputPixels),metadata.maxColorValue, args.extra[0]) {
-  std::map<Color, uint16_> colours;
-  for (cons //iterate through colours input inputfile){
-  	if (colours.find(Color(0, 0, 0)) != colours.end()) {
-    	tablecolours[color] = n_colours + 1;
-        n_colours++;
-    }
-  }
+std:: map<Pixel<uint16_>> getcolors(const std::vector<Pixel<uint8_t>>(%inputPixels),maxColorValue) {
+  std::map<Pixel, uint16_> Pixel_map;
+   for (const auto& pixel : pixels) {
+        // Check if the color is already in the map
+        if (Pixel_map.find(pixel) == Pixel_map.end()) {
+            // Assign a new index to this color
+            uint16_t index = static_cast<uint16_t>(Pixel_map.size());
+            Pixel_map[pixel] = index;
+        }
+   }
 }
 
 
 void CCompress::writeCompressedData(outputFile, const std::map<Color, uint16_>& colorMap, n_colors) {
 	int limitvalue = 255;
     int limitvalue2 = 65535;
-    for (coonst [color: colorMap]{
+    for (const [color: colorMap]{
     	if(maxColorValue < limitvalue) {
         	const r = static_cast<uint8_t>(color.r);
             const g = static_cast<uint8_t>(color.g);
