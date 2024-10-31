@@ -33,7 +33,7 @@ void getpixels(const inputFile){
   }
 }
 
-std:: map<(Pixel<uint16_>), uint16_> getcolors(const std::vector<Pixel<uint8_t>>(%inputPixels),maxColorValue, n_colors) {
+std:: map<(Pixel<uint16_>), uint16_> getcolors(const std::vector<Pixel<uint16_t>>(%inputPixels), maxColorValue, n_colors) {
   std::map<Pixel, uint16_> Pixel_map;
    for (const auto& pixel : pixels) {
         // Check if the color is already in the map
