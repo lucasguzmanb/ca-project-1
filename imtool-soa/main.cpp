@@ -41,38 +41,52 @@ int main(int const argc, char * argv[]) {
 
   // read binary data -> store using AOS (8 or 16 bits)
   std::variant<ImageSOA<uint8_t>, ImageSOA<uint16_t>> inputPixels;
+  ImageSOA<uint8_t> inputPixels8;
+  ImageSOA<uint16_t> inputPixels16;
   if (isInputUint8) {
-    inputPixels = binaryToSOA<uint8_t>(inputFile, metadata.width, metadata.height);
+    inputPixels8 = binaryToSOA<uint8_t>(inputFile, metadata.width, metadata.height);
   } else {
-    inputPixels = binaryToSOA<uint16_t>(inputFile, metadata.width, metadata.height);
+    inputPixels16 = binaryToSOA<uint16_t>(inputFile, metadata.width, metadata.height);
   }
   // perform requested operation (8 or 16 bits)
-  std::variant<ImageSOA<uint8_t>, ImageSOA<uint16_t>> outputPixels;
+  ImageSOA<uint8_t> outputPixels8;
+  ImageSOA<uint16_t> outputPixels16;
   if (args.operation == "maxlevel") {
     if (isInputUint8) {
-      outputPixels = maxlevel<uint8_t>(std::get<ImageSOA<uint8_t>>(inputPixels),
-                                       metadata.maxColorValue, args.extra[0]);
+      if (args.extra[0] <= THRESHOLD) {
+        outputPixels8 =
+            maxlevel<uint8_t, uint8_t>(inputPixels8, metadata.maxColorValue, args.extra[0]);
+      } else {
+        outputPixels16 =
+            maxlevel<uint8_t, uint16_t>(inputPixels8, metadata.maxColorValue, args.extra[0]);
+      }
     } else {
-      outputPixels = maxlevel<uint16_t>(std::get<ImageSOA<uint16_t>>(inputPixels),
-                                        metadata.maxColorValue, args.extra[0]);
+      if (args.extra[0] <= THRESHOLD) {
+        outputPixels8 =
+            maxlevel<uint16_t, uint8_t>(inputPixels16, metadata.maxColorValue, args.extra[0]);
+      } else {
+        outputPixels16 =
+            maxlevel<uint16_t, uint16_t>(inputPixels16, metadata.maxColorValue, args.extra[0]);
+      }
     }
     newMetadata.maxColorValue = args.extra[0];
   } else if (args.operation == "resize") {
     if (isInputUint8) {
-      outputPixels =
-          resize<uint8_t>(std::get<ImageSOA<uint8_t>>(inputPixels), metadata, args.extra);
+      outputPixels8 =
+          resize<uint8_t>(inputPixels8, metadata, args.extra);
     } else {
-      outputPixels =
-          resize<uint16_t>(std::get<ImageSOA<uint16_t>>(inputPixels), metadata, args.extra);
+      outputPixels16 =
+          resize<uint16_t>(inputPixels16, metadata, args.extra);
     }
     newMetadata.width  = args.extra[0];
     newMetadata.height = args.extra[1];
   } else if (args.operation == "cutfreq") {
-    outputPixels = inputPixels;
     if (isInputUint8) {
+      outputPixels8 = inputPixels8;
       std::cout << "cutfreq8\n";
     } else {
       std::cout << "cutfreq16\n";
+      outputPixels16 = inputPixels16;
     }
   } else if (args.operation == "compress") {
     if (isInputUint8) {
@@ -92,7 +106,11 @@ int main(int const argc, char * argv[]) {
   writeMetadata(outputFile, newMetadata);
 
   // write binary data
-  writeBinaryData(outputFile, outputPixels);
+  if (newMetadata.maxColorValue <= THRESHOLD) {
+    SOAToBinary<uint8_t>(outputFile, outputPixels8);
+  } else {
+    SOAToBinary<uint16_t>(outputFile, outputPixels16);
+  }
 
   inputFile.close();
   outputFile.close();
