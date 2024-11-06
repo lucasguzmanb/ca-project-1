@@ -29,14 +29,8 @@ struct Pixel_map {
 
 template <typename T>
 std::vector<Pixel<T>> binaryToAOS(std::ifstream & inputFile, int const width, int const height) {
-  // Create a vector of raw data to store the binary data and read everything at once
-  auto dataSize = static_cast<std::size_t>(width * height * 3);
-  std::vector<T> tempData(dataSize);
 
-  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-  inputFile.read(reinterpret_cast<char *>(tempData.data()),
-                 static_cast<std::streamsize>(dataSize * sizeof(T)));
-
+  std::vector<T> tempData = readRawData<T>(inputFile, width, height);
   std::vector<Pixel<T>> data(static_cast<std::size_t>(width * height));
 
   // Convert the raw data to AOS

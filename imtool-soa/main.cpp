@@ -40,7 +40,6 @@ int main(int const argc, char * argv[]) {
   bool const isInputUint8 = metadata.maxColorValue <= THRESHOLD;
 
   // read binary data -> store using AOS (8 or 16 bits)
-  std::variant<ImageSOA<uint8_t>, ImageSOA<uint16_t>> inputPixels;
   ImageSOA<uint8_t> inputPixels8;
   ImageSOA<uint16_t> inputPixels16;
   if (isInputUint8) {

@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <vector>
 
 Metadata obtainMetadata(std::ifstream & inputFile) {
   Metadata metadata;
