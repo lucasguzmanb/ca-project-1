@@ -7,34 +7,130 @@
 #include <bits/ranges_algo.h>
 #include <cmath>
 #include <queue>
+#include <map>
 #include <unordered_map>
+#include <vector>
+#include <limits>
+#include <chrono>
+
+
 
 template <typename T>
-double euclideanDistance(Pixel<T> const & first, Pixel<T> const & second) {
-  return std::sqrt(std::pow(first.r - second.r, 2) + std::pow(first.g - second.g, 2) +
-                   std::pow(first.b - second.b, 2));
-}
+class KDTree {
+public:
+    KDTree(const std::vector<Pixel<T>>& points) : tree(points) {
+        buildTree(0, tree.size(), 0);
+    }
 
-// Custom comparator for a pair of Pixel<T> and int
-template <typename T>
-bool comparePair(std::pair<Pixel<T>, int> const & pair1, std::pair<Pixel<T>, int> & pair2) {
-  return pair1.second < pair2.second;
-}
+    // Find the nearest neighbor to a given pixel in the KD-Tree
+    Pixel<T> nearestNeighbor(const Pixel<T>& target) const {
+        Pixel<T> bestMatch;
+        double bestDistance = std::numeric_limits<double>::max();
+        nearestNeighborSearch(0, tree.size(), 0, target, bestMatch, bestDistance);
+        return bestMatch;
+    }
+
+private:
+    std::vector<Pixel<T>> tree;
+
+    // Build KD-Tree in place with an optimized iterative structure
+    void buildTree(size_t start, size_t end, int depth) {
+        std::vector<std::tuple<size_t, size_t, int>> stack;
+        stack.push_back(std::make_tuple(start, end, depth));
+
+        while (!stack.empty()) {
+            auto [currentStart, currentEnd, currentDepth] = stack.back();
+            stack.pop_back();
+
+            if (currentStart >= currentEnd) continue;
+
+            int axis = currentDepth % 3;
+            auto comparator = [axis](const Pixel<T>& a, const Pixel<T>& b) {
+                return (axis == 0) ? a.r < b.r : (axis == 1) ? a.g < b.g : a.b < b.b;
+            };
+
+            size_t median = (currentStart + currentEnd) / 2;
+            std::nth_element(tree.begin() + static_cast<typename std::vector<Pixel<T>>::difference_type>(currentStart),
+                tree.begin() + static_cast<typename std::vector<Pixel<T>>::difference_type>(median),
+                tree.begin() + static_cast<typename std::vector<Pixel<T>>::difference_type>(currentEnd), comparator);
+
+
+            // Push left and right subtrees onto the stack
+            stack.push_back(std::make_tuple(currentStart, median, currentDepth + 1));
+            stack.push_back(std::make_tuple(median + 1, currentEnd, currentDepth + 1));
+        }
+    }
+
+    // Optimized nearest neighbor search
+    void nearestNeighborSearch(size_t start, size_t end, int depth, const Pixel<T>& target,
+                               Pixel<T>& bestMatch, double& bestDistance) const {
+        if (start >= end) return;
+
+        int axis = depth % 3;
+        size_t median = (start + end) / 2;
+        const Pixel<T>& current = tree[median];
+
+        double dist = euclideanDistance(current, target);
+        if (dist < bestDistance) {
+            bestDistance = dist;
+            bestMatch = current;
+        }
+
+        // Decide which subtree to search first based on the current splitting axis
+        bool leftFirst = (axis == 0 && target.r < current.r) ||
+                         (axis == 1 && target.g < current.g) ||
+                         (axis == 2 && target.b < current.b);
+
+        size_t nearStart = leftFirst ? start : median + 1;
+        size_t nearEnd = leftFirst ? median : end;
+        size_t farStart = leftFirst ? median + 1 : start;
+        size_t farEnd = leftFirst ? end : median;
+
+        // Search the closer subtree first
+        nearestNeighborSearch(nearStart, nearEnd, depth + 1, target, bestMatch, bestDistance);
+
+        // If there's a chance the other side could contain a closer point, search it
+        double axisDist = std::abs((axis == 0 ? target.r - current.r
+                                 : axis == 1 ? target.g - current.g
+                                             : target.b - current.b));
+
+        if (axisDist < bestDistance) {
+            nearestNeighborSearch(farStart, farEnd, depth + 1, target, bestMatch, bestDistance);
+        }
+    }
+
+    // Calculate Euclidean distance between two pixels
+    double euclideanDistance(const Pixel<T>& a, const Pixel<T>& b) const {
+        return std::sqrt(std::pow(a.r - b.r, 2) + std::pow(a.g - b.g, 2) + std::pow(a.b - b.b, 2));
+    }
+};
+
+
 
 template <typename T>
-void removeLFCaos(std::vector<Pixel<T>> & pixels, int n) {
+void removeLFCaos(std::vector<Pixel<T>>& pixels, int n) {
+  auto start = std::chrono::high_resolution_clock::now();
   std::unordered_map<Pixel<T>, int, Pixel_map<T>> frequency;
 
   // Calculate frequency of each color
-  for (auto const & pixel : pixels) { ++frequency[pixel]; }
-
+  for (const auto& pixel : pixels) {
+    ++frequency[pixel];
+  }
+  auto end = std::chrono::high_resolution_clock::now();
+  std::chrono::duration<double> duration = end - start;
+  std::cout << "Start sorting: " << duration.count()<<"\n";
   std::vector<std::pair<Pixel<T>, int>> frequencyVector(frequency.begin(), frequency.end());
-  std::partial_sort(frequencyVector.begin(), frequencyVector.begin() + n, frequencyVector.end(),
-                    comparePair<T>);
-
-  // Divide colors in removed_pixels and remaining_colors
+  std::sort(frequencyVector.begin(), frequencyVector.end(),
+                    [](const auto& pair1, const auto& pair2) {
+                      return std::tie(pair1.second, pair1.first.b, pair1.first.r, pair1.first.g) >
+                             std::tie(pair2.second, pair2.first.b, pair2.first.r, pair2.first.g);
+                    });
+  end = std::chrono::high_resolution_clock::now();
+  duration = end - start;
+  std::cout << "Finish sorting: " << duration.count()<<"\n";
   std::vector<Pixel<T>> removed_pixels;
   std::vector<Pixel<T>> remainingColors;
+
   for (size_t i = 0; i < frequencyVector.size(); ++i) {
     if (i < static_cast<size_t>(n)) {
       removed_pixels.push_back(frequencyVector[i].first);
@@ -42,29 +138,33 @@ void removeLFCaos(std::vector<Pixel<T>> & pixels, int n) {
       remainingColors.push_back(frequencyVector[i].first);
     }
   }
-
+  end = std::chrono::high_resolution_clock::now();
+  duration = end - start;
+  std::cout << "Start to build the tree: " << duration.count()<<"\n";
+  // Build k-d tree with remaining colors
+  KDTree<T> kdTree(remainingColors);
+  end = std::chrono::high_resolution_clock::now();
+  duration = end - start;
+  std::cout << "Build the tree: " << duration.count()<<"\n";
+  // Map removed pixels to their closest color using k-d tree
   std::unordered_map<Pixel<T>, Pixel<T>, Pixel_map<T>> replacementMap;
-
-  for (auto const & pixel : removed_pixels) {
-    double minDistance    = std::numeric_limits<double>::max();
-    Pixel<T> closestColor = pixel;  // Start with the same color
-
-    for (auto const & remainingColor : remainingColors) {
-      double distance = euclideanDistance(pixel, remainingColor);
-      if (distance < minDistance && pixel != remainingColor) {
-        minDistance  = distance;
-        closestColor = remainingColor;
-      }
-    }
-    replacementMap[pixel] = closestColor;
+  for (const auto& pixel : removed_pixels) {
+    replacementMap[pixel] = kdTree.nearestNeighbor(pixel);
   }
+  end = std::chrono::high_resolution_clock::now();
+  duration = end - start;
+  std::cout << "Start writing: " << duration.count()<<"\n";
   // Replace pixels in the original image
-  for (auto & pixel : pixels) {
-    auto newPixel = replacementMap.find(pixel);
-    if (newPixel != replacementMap.end()) {
-      pixel = newPixel->second;  // Update pixel color
+  for (auto& pixel : pixels) {
+    auto it = replacementMap.find(pixel);
+    if (it != replacementMap.end()) {
+      pixel = it->second;
     }
   }
+  end = std::chrono::high_resolution_clock::now();
+  duration = end - start;
+  std::cout << "Execution finished: " << duration.count()<<"\n";
 }
+
 
 #endif  // CUTFREQ_AOS_HPP
