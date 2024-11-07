@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include <vector>
 
 struct Metadata {
     std::string format;
@@ -20,17 +21,15 @@ std::ofstream openOutputFile(std::filesystem::path const & fileName);
 void writeMetadata(std::ofstream & outputFile, Metadata const & metadata);
 
 template <typename T>
-T readBinary(std::istream & input) {
-    T value;
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-    input.read(reinterpret_cast<char *>(&value), sizeof(value));
-    return value;
-}
+std::vector<T> readRawData(std::ifstream & inputFile, int const width, int const height) {
+  // Create a vector of raw data to store the binary data and read everything at once
+  auto dataSize = static_cast<std::size_t>(width * height * 3);
+  std::vector<T> tempData(dataSize);
 
-template <typename T>
-void writeBinary(std::ostream & output, T const & value) {
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-    output.write(reinterpret_cast<char const *>(&value), sizeof(value));
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+  inputFile.read(reinterpret_cast<char *>(tempData.data()),
+                 static_cast<std::streamsize>(dataSize * sizeof(T)));
+  return tempData;
 }
 
 #endif  // BINARYIO_HPP
