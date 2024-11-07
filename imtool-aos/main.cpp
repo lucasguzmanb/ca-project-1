@@ -88,7 +88,7 @@ int main(int const argc, char * argv[]) {
   } else if (args.operation == "compress") {
     if (isInputUint8) {
       std::cout << "compress8\n";
-      void CCompress::compress(const std::vector<Pixel<uint8_t>>(&inputPixels), maxColorValue);
+      void CCompress::compress(const vector<Pixel<uint8_t>>(&inputPixels), maxColorValue);
     } else {
       std::cout << "compress16\n";
       void CCompress::compress(const std::vector<Pixel<uint8_t>>(&inputPixels), maxColorValue);
