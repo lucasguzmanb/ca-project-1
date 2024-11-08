@@ -48,9 +48,11 @@ add_subdirectory(imgsoa)
 add_subdirectory(common)
 
 # Add unit tests
+option(IMG_BUILD_TESTS "Build tests" ON)
 if (IMG_BUILD_TESTS)
     enable_testing()
-    add_subdirectory(utest-img)
+    add_subdirectory(utest-imgaos)
+    add_subdirectory(utest-imgsoa)
     add_subdirectory(utest-common)
 endif ()
 
