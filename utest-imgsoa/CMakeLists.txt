@@ -5,6 +5,6 @@ add_executable(utest-imgsoa
 # Library dependencies
 target_link_libraries (utest-imgsoa
         PRIVATE
-        img-aos
+        imgaos
         GTest::gtest_main
         Microsoft.GSL::GSL)
