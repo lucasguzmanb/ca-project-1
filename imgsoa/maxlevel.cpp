@@ -4,15 +4,15 @@
 template <typename T, typename U>
 ImageSOA<U> maxlevel(ImageSOA<T> inputImage, int const oldLevel, int const newLevel) {
   ImageSOA<U> outputImage(inputImage.r.size());
-  double const oldLevelHalf    = oldLevel / 2.0;
-  double const oldLevelInverse = 1.0 / oldLevel;
+  double const transformation = newLevel * (1.0 / oldLevel);
+  // Convert each pixel to the new level using a formula to round the result
   for (size_t i = 0; i < inputImage.r.size(); ++i) {
     outputImage.r[i] =
-        static_cast<U>((inputImage.r[i] * newLevel + oldLevelHalf) * oldLevelInverse);
+        static_cast<U>(inputImage.r[i] * transformation);
     outputImage.g[i] =
-        static_cast<U>((inputImage.g[i] * newLevel + oldLevelHalf) * oldLevelInverse);
+        static_cast<U>(inputImage.g[i] * transformation);
     outputImage.b[i] =
-        static_cast<U>((inputImage.b[i] * newLevel + oldLevelHalf) * oldLevelInverse);
+        static_cast<U>(inputImage.b[i] * transformation);
   }
   return outputImage;
 }

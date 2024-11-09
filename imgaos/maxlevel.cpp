@@ -6,16 +6,15 @@ template <typename T, typename U>
 std::vector<Pixel<U>> maxlevel(std::vector<Pixel<T>> inputImage, int const oldLevel,
                                int const newLevel) {
   std::vector<Pixel<U>> outputImage(inputImage.size());
-  double const oldLevelHalf    = oldLevel / 2.0;
-  double const oldLevelInverse = 1.0 / oldLevel;
-
+  double const transformation = newLevel * (1.0 / oldLevel);
+  // Convert each pixel to the new level using a formula to round the result
   for (size_t i = 0; i < inputImage.size(); ++i) {
     outputImage[i].r =
-        static_cast<U>((inputImage[i].r * newLevel + oldLevelHalf) * oldLevelInverse);
+        static_cast<U>(inputImage[i].r * transformation);
     outputImage[i].g =
-        static_cast<U>((inputImage[i].g * newLevel + oldLevelHalf) * oldLevelInverse);
+        static_cast<U>(inputImage[i].g * transformation);
     outputImage[i].b =
-        static_cast<U>((inputImage[i].b * newLevel + oldLevelHalf) * oldLevelInverse);
+        static_cast<U>(inputImage[i].b * transformation);
   }
 
   return outputImage;
