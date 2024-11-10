@@ -6,6 +6,7 @@
 #include "../imgsoa/resize.hpp"
 #include "common/info.hpp"
 #include "imgsoa/maxlevel.hpp"
+#include "imgsoa/compress.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -90,8 +91,12 @@ int main(int const argc, char * argv[]) {
   } else if (args.operation == "compress") {
     if (isInputUint8) {
       std::cout << "compress8\n";
+      outputPixels8 =
+          compress<uint8_t>(inputPixels8, metadata);
     } else {
       std::cout << "compress16\n";
+      outputPixels16 =
+          compress<uint8_t>(inputPixels16, metadata);
     }
   } else {
     std::cerr << "Error: unknown operation\n";
