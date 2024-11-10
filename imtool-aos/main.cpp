@@ -7,6 +7,7 @@
 #include "imgaos/imageaos.hpp"
 #include "imgaos/maxlevel.hpp"
 #include "imgaos/resize.hpp"
+#include "imgaos/compress.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -89,11 +90,11 @@ int main(int const argc, char * argv[]) {
   } else if (args.operation == "compress") {
     if (isInputUint8) {
       std::cout << "compress8\n";
-      outputPixels8 = compress (inputPixels8, metadata.maxColorValue, args.extra[0]);
+      outputPixels8 = compress(inputPixels8, metadata);
 
     } else {
       std::cout << "compress16\n";
-      outputPixels16 = compress (inputPixels16, metadata.maxColorValue, args.extra[0])
+      outputPixels16 = compress(inputPixels16, metadata);
     }
   } else {
     std::cerr << "Error: unknown operation\n";

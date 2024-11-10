@@ -9,67 +9,64 @@
 
 
 template <typename T>
-std::vector<Pixel<T>> compress(const std::vector<Pixel<uint8_t>> inputPixels, Metadata metadata) {
+std::vector<Pixel<T>> compress(const std::vector<Pixel<T>> inputPixels, Metadata metadata) {
     //initialize values
     int const maxColorValue = metadata.maxColorValue;
-    std:: map<Pixel<T>, T> pixelMap = getcolors(inputPixels, maxColorValue, n_colors);
-    std::vector<Pixel<T>> outputPixels = write_data(outputFile, pixelMap, maxColorValue);
+    std:: map<Pixel<T>, T> pixelMap = getcolors(inputPixels, maxColorValue);
+    std::vector<Pixel<T>> outputPixels = write_data(pixelMap, maxColorValue);
+};
 
-}
 
 template <typename T>
-std:: map<Pixel<T>, T> getcolors(std::vector<Pixel<T>>inputPixels), maxColorValue, n_colors) {
-  std::map<Pixel, uint16_> Pixel_map;
-   for (const auto& pixel : pixels) {
-        // Check if the color is already in the map
-        if (Pixel_map.find(pixel) == Pixel_map.end()) {
-            // Assign a new index to this color
-            uint16_t index = static_cast<uint16_t>(Pixel_map.size());
-            Pixel_map[pixel] = index;
-        }
-   }
+std::map<Pixel<T>, uint16_t> getColors(const std::vector<Pixel<T>>& inputPixels, int maxColorValue) {
+  std::map<Pixel<T>, uint16_t> pixelMap;
+  for (const auto& pixel : inputPixels) {
+    // Check if the color is in the map
+    if (pixelMap.find(pixel) == pixelMap.end()) {
+      // Assign a new index to this color
+      uint16_t index = static_cast<uint16_t>(pixelMap.size());
+      pixelMap[pixel] = index;
+    }
+  }
+  return pixelMap; // Return the pixel map
 }
+
+
 
 template <typename T>
-void writeCompressedData(outputFile, const std::map<Pixel<T>, uint16_t>& pixelMap, n_colors) {
-  int const limitvalue = 255;
-  int const limitvalue2 = 65535;
-    for (const [pixel: pixelMap]{
-    	if(maxColorValue < limitvalue) {
-    	    const r = static_cast<uint8_t>(color.r);
-            const g = static_cast<uint8_t>(color.g);
-            const b = static_cast<uint8_t>(color.b);
-            binary::writeBinary(outputFile, r);
-            binary::writeBinary(outputFile, g);
-            binary::writeBinary(outputFile, b);
-        }else{
-            binary::writeBinary(outputFile, color.r);
-            binary::writeBinary(outputFile, color.g);
-            binary::writeBinary(outputFile, color.b);
-        }
+std::vector<Pixel<T>> writeCompressedData(const std::vector<Pixel<T>>& inputPixels,std::map<Pixel<T>, uint16_t> &pixelMap, int maxColorValue){
+  constexpr int limitvalue = 255;
+  constexpr int limitvalue2 = 65535;
+  std::vector<Pixel<T>> outputPixels;
+  // Write pixel data to outputPixels vector
+  for (const auto& [pixel, index] : pixelMap) {
+    // Store the pixel in the vector
+    if (maxColorValue <= limitvalue) {
+      // For 8-bit color depth
+      uint8_t r = static_cast<uint8_t>(pixel.r);
+      uint8_t g = static_cast<uint8_t>(pixel.g);
+      uint8_t b = static_cast<uint8_t>(pixel.b);
+      outputPixels.push_back(Pixel<T>{r, g, b}); // Add the pixel to the vector
+    } else {
+      // For higher color depths
+      outputPixels.push_back(pixel); // Add the pixel to the vector directly
     }
-    for (std::size_t i = 0; i < pixels.size; i++) {
-    	if (n_colors <= limitvalue) {
-        	index = static_cast<uint8_t>(Pixel_map[i];
-			binary::writeBinary(outputFile, index);
-    	}else if ((n_colours >=limit1+1) && (n_colours <= limitvalue2)) {
-        	uint16_t index =Pixel_map[i];
-            binary::writeBinary(outputFile, index);
-        }else{
-          index = static_cast<uint32_t>(Pixel_map[i]);
-          binary::writeBinary(outputFile, index);
-        }
+  }
+  // Write indices for the pixel data
+  for (const auto& [pixel, index] : pixelMap) {
+    if (pixelMap.size() <= limitvalue) {
+      uint8_t index8 = static_cast<uint8_t>(index);
+      outputPixels.push_back(Pixel<T>{index8, 0, 0}); // Store index as a pixel (dummy values for g and b)
+    } else if (pixelMap.size() <= limitvalue2) {
+      uint16_t index16 = static_cast<uint16_t>(index);
+      outputPixels.push_back(Pixel<T>{index16, 0, 0}); // Store index as a pixel (dummy values for g and b)
+    } else {
+      uint32_t index32 = static_cast<uint32_t>(index);
+      outputPixels.push_back(Pixel<T>{index32, 0, 0}); // Store index as a pixel (dummy values for g and b)
     }
-}
+  }
 
-
-
-
-
-
-
-
-
+  return outputPixels; // Return the vector of output pixels
 
 
 };
