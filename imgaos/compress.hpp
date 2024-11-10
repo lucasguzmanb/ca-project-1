@@ -12,13 +12,15 @@ template <typename T>
 std::vector<Pixel<T>> compress(const std::vector<Pixel<T>> inputPixels, Metadata metadata) {
     //initialize values
     int const maxColorValue = metadata.maxColorValue;
-    std:: map<Pixel<T>, T> pixelMap = getcolors(inputPixels, maxColorValue);
-    std::vector<Pixel<T>> outputPixels = write_data(pixelMap, maxColorValue);
-};
+    std:: map<Pixel<T>, uint16_t> pixelMap = getColors(inputPixels);
+    std::vector<Pixel<T>> outputPixels = writeCompressedData(pixelMap, maxColorValue);
+    return outputPixels;
+
+}
 
 
 template <typename T>
-std::map<Pixel<T>, uint16_t> getColors(const std::vector<Pixel<T>>& inputPixels, int maxColorValue) {
+std::map<Pixel<T>, uint16_t> getColors(const std::vector<Pixel<T>>& inputPixels) {
   std::map<Pixel<T>, uint16_t> pixelMap;
   for (const auto& pixel : inputPixels) {
     // Check if the color is in the map
@@ -34,7 +36,7 @@ std::map<Pixel<T>, uint16_t> getColors(const std::vector<Pixel<T>>& inputPixels,
 
 
 template <typename T>
-std::vector<Pixel<T>> writeCompressedData(const std::vector<Pixel<T>>& inputPixels,std::map<Pixel<T>, uint16_t> &pixelMap, int maxColorValue){
+std::vector<Pixel<T>> writeCompressedData(std::map<Pixel<T>, uint16_t> &pixelMap, int maxColorValue){
   constexpr int limitvalue = 255;
   constexpr int limitvalue2 = 65535;
   std::vector<Pixel<T>> outputPixels;
