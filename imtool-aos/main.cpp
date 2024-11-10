@@ -36,6 +36,7 @@ int main(int const argc, char * argv[]) {
     return 0;
   }
 
+
   constexpr int THRESHOLD = 255;
   bool const isInputUint8 = metadata.maxColorValue <= THRESHOLD;
 
@@ -88,10 +89,11 @@ int main(int const argc, char * argv[]) {
   } else if (args.operation == "compress") {
     if (isInputUint8) {
       std::cout << "compress8\n";
-      void CCompress::compress(const vector<Pixel<uint8_t>>(&inputPixels), maxColorValue);
+      outputPixels8 = compress (inputPixels8, metadata.maxColorValue, args.extra[0]);
+
     } else {
       std::cout << "compress16\n";
-      void CCompress::compress(const std::vector<Pixel<uint8_t>>(&inputPixels), maxColorValue);
+      outputPixels16 = compress (inputPixels16, metadata.maxColorValue, args.extra[0])
     }
   } else {
     std::cerr << "Error: unknown operation\n";
