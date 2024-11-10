@@ -21,8 +21,8 @@ namespace {
 
 // Define test cases
 struct TestCase {
-    std::string inputFile;
-    std::string outputFile;
+    std::filesystem::path inputFile;
+    std::filesystem::path outputFile;
     int newMaxColorValue;
 };
 

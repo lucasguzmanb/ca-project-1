@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 struct Metadata {
@@ -11,6 +12,14 @@ struct Metadata {
     int width;
     int height;
     int maxColorValue;
+
+    // Constructor
+    Metadata(std::string _format, int const _width, int const _height, int const _maxColorValue)
+      : format(std::move(_format)), width(_width), height(_height), maxColorValue(_maxColorValue) {
+    }
+
+    // Default constructor
+    Metadata() : width(0), height(0), maxColorValue(0) { }
 };
 
 Metadata obtainMetadata(std::ifstream & inputFile);
