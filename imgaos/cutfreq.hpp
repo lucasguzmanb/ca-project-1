@@ -15,6 +15,17 @@
 
 
 
+#include <cmath>
+#include <limits>
+#include <map>
+#include <vector>
+#include <algorithm>
+#include <tuple>
+#include <chrono>
+#include <iostream>
+
+// Assume Pixel<T> and Pixel_map<T> are already defined, as in the original code.
+
 template <typename T>
 class KDTree {
 public:
@@ -51,9 +62,8 @@ private:
 
             size_t median = (currentStart + currentEnd) / 2;
             std::nth_element(tree.begin() + static_cast<typename std::vector<Pixel<T>>::difference_type>(currentStart),
-                tree.begin() + static_cast<typename std::vector<Pixel<T>>::difference_type>(median),
-                tree.begin() + static_cast<typename std::vector<Pixel<T>>::difference_type>(currentEnd), comparator);
-
+                             tree.begin() + static_cast<typename std::vector<Pixel<T>>::difference_type>(median),
+                             tree.begin() + static_cast<typename std::vector<Pixel<T>>::difference_type>(currentEnd), comparator);
 
             // Push left and right subtrees onto the stack
             stack.push_back(std::make_tuple(currentStart, median, currentDepth + 1));
@@ -105,32 +115,29 @@ private:
     }
 };
 
-
-
 template <typename T>
 void removeLFCaos(std::vector<Pixel<T>>& pixels, int n) {
   auto start = std::chrono::high_resolution_clock::now();
-  std::unordered_map<Pixel<T>, int, Pixel_map<T>> frequency;
 
-  // Calculate frequency of each color
+  // Step 1: Calculate frequency of each color
+  std::map<Pixel<T>, int, Pixel_map<T>> frequency;
   for (const auto& pixel : pixels) {
     ++frequency[pixel];
   }
+
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> duration = end - start;
-  std::cout << "Start sorting: " << duration.count()<<"\n";
+  std::cout << "Frequency map: " << duration.count() << "\n";
+
+  // Step 2: Sort colors by frequency, breaking ties by higher b, g, and r values
   std::vector<std::pair<Pixel<T>, int>> frequencyVector(frequency.begin(), frequency.end());
   std::sort(frequencyVector.begin(), frequencyVector.end(),
-                    [](const auto& pair1, const auto& pair2) {
-                      return std::tie(pair1.second, pair1.first.b, pair1.first.r, pair1.first.g) >
-                             std::tie(pair2.second, pair2.first.b, pair2.first.r, pair2.first.g);
-                    });
-  end = std::chrono::high_resolution_clock::now();
-  duration = end - start;
-  std::cout << "Finish sorting: " << duration.count()<<"\n";
-  std::vector<Pixel<T>> removed_pixels;
-  std::vector<Pixel<T>> remainingColors;
+            [](const auto& pair1, const auto& pair2) {
+                return std::tie(pair1.second, pair1.first.b, pair1.first.g, pair1.first.r) <
+                       std::tie(pair2.second, pair2.first.b, pair2.first.g, pair2.first.r);
+            });
 
+  std::vector<Pixel<T>> removed_pixels, remainingColors;
   for (size_t i = 0; i < frequencyVector.size(); ++i) {
     if (i < static_cast<size_t>(n)) {
       removed_pixels.push_back(frequencyVector[i].first);
@@ -138,33 +145,29 @@ void removeLFCaos(std::vector<Pixel<T>>& pixels, int n) {
       remainingColors.push_back(frequencyVector[i].first);
     }
   }
-  end = std::chrono::high_resolution_clock::now();
-  duration = end - start;
-  std::cout << "Start to build the tree: " << duration.count()<<"\n";
-  // Build k-d tree with remaining colors
+
+  // Step 3: Build k-d tree for remaining colors
   KDTree<T> kdTree(remainingColors);
-  end = std::chrono::high_resolution_clock::now();
-  duration = end - start;
-  std::cout << "Build the tree: " << duration.count()<<"\n";
-  // Map removed pixels to their closest color using k-d tree
-  std::unordered_map<Pixel<T>, Pixel<T>, Pixel_map<T>> replacementMap;
+
+  // Step 4: Map removed pixels to their closest color using the KD-Tree
+  std::map<Pixel<T>, Pixel<T>, Pixel_map<T>> replacementMap;
   for (const auto& pixel : removed_pixels) {
     replacementMap[pixel] = kdTree.nearestNeighbor(pixel);
   }
-  end = std::chrono::high_resolution_clock::now();
-  duration = end - start;
-  std::cout << "Start writing: " << duration.count()<<"\n";
-  // Replace pixels in the original image
+
+  // Step 5: Replace pixels in the original image
   for (auto& pixel : pixels) {
     auto it = replacementMap.find(pixel);
     if (it != replacementMap.end()) {
       pixel = it->second;
     }
   }
+
   end = std::chrono::high_resolution_clock::now();
   duration = end - start;
-  std::cout << "Execution finished: " << duration.count()<<"\n";
+  std::cout << "Execution finished: " << duration.count() << "\n";
 }
+
 
 
 #endif  // CUTFREQ_AOS_HPP
