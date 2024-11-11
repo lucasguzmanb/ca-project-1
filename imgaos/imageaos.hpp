@@ -18,12 +18,23 @@ struct Pixel {
     bool operator==(Pixel<T> const & other) const {
       return std::tie(r, g, b) == std::tie(other.r, other.g, other.b);
     }
+    bool operator<(const Pixel &other) const {
+      if (r != other.r) {return r < other.r;}
+      if (g != other.g) {return g < other.g;}
+      return b < other.b;
+
+    }
 };
 
 template <typename T>
 struct Pixel_map {
     std::size_t operator()(Pixel<T> const & color) const {
       return std::hash<T>{}(color.r) ^ std::hash<T>{}(color.g) ^ std::hash<T>{}(color.b);
+    }
+  bool operator()(const Pixel<T>& a, const Pixel<T>& b) const {
+      if (a.r != b.r) return a.r < b.r;
+      if (a.g != b.g) return a.g < b.g;
+      return a.b < b.b;
     }
 };
 
