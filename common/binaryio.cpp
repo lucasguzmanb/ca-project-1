@@ -18,7 +18,7 @@ std::ifstream openInputFile(std::filesystem::path const & fileName) {
   // check if file can be opened
   if (!inputFile.is_open()) {
     std::cerr << "Error: can't open file " << fileName << '\n';
-    exit(-1);
+    exit(EXIT_FAILURE);
   }
   return inputFile;
 }
@@ -28,7 +28,7 @@ std::ofstream openOutputFile(std::filesystem::path const & fileName) {
   // check if file can be opened
   if (!outputFile.is_open()) {
     std::cerr << "Error: can't open file " << fileName << '\n';
-    exit(-1);
+    exit(EXIT_FAILURE);
   }
   return outputFile;
 }

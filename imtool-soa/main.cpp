@@ -29,7 +29,7 @@ int main(int const argc, char * argv[]) {
   // check if file is in P6 format
   if (metadata.format != "P6") {
     std::cerr << "Error: file is not in .ppm format\n";
-    exit(-1);
+    exit(EXIT_FAILURE);
   }
 
   if (args.operation == "info") {
@@ -100,7 +100,7 @@ int main(int const argc, char * argv[]) {
     }
   } else {
     std::cerr << "Error: unknown operation\n";
-    exit(-1);
+    exit(EXIT_FAILURE);
   }
 
   /// open output file
