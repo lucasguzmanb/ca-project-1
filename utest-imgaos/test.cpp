@@ -32,6 +32,7 @@ TEST(utest-imgaos, ResizeAndCompare) {
     Metadata newMetadata = inputMetadata;
     newMetadata.height = testCase.newHeight;
     newMetadata.width = testCase.newWidth;
+    
 
     // Load input image
     std::vector<Pixel<uint8_t>> inputPixels = binaryToAOS<uint8_t>(inputFile, inputMetadata.width, inputMetadata.height);
