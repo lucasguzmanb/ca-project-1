@@ -29,6 +29,8 @@ std::ofstream openOutputFile(std::filesystem::path const & fileName);
 
 void writeMetadata(std::ofstream & outputFile, Metadata const & metadata);
 
+void writeMetadataCPPM(std::ofstream & outputFile, Metadata const & metadata, int numColors);
+
 template <typename T>
 std::vector<T> readRawData(std::ifstream & inputFile, int const width, int const height) {
   // Create a vector of raw data to store the binary data and read everything at once
