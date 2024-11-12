@@ -7,10 +7,10 @@
 
 
 template <typename T>
-void compress(const std::vector<Pixel<T>> &inputPixels, std::ofstream &outputFile) {
+void compress(const std::vector<Pixel<T>> &inputPixels, std::ofstream &outputFile, Metadata const &metadata) {
     //int const maxColorValue = metadata.maxColorValue;
     std:: map<Pixel<T>, uint32_t> pixelMap = getColors(inputPixels);
-    writeCompressedData(inputPixels,pixelMap, outputFile);
+    writeCompressedData(inputPixels,pixelMap, outputFile, metadata);
 }
 
 
@@ -31,11 +31,12 @@ std::map<Pixel<T>, uint32_t> getColors(const std::vector<Pixel<T>>& inputPixels)
 
 
 template <typename T>
-void writeCompressedData(const std::vector<Pixel<T>>& inputPixels, std::map<Pixel<T>, uint32_t> &pixelMap, std::ofstream &outputFile) {
+void writeCompressedData(const std::vector<Pixel<T>>& inputPixels, std::map<Pixel<T>, uint32_t> &pixelMap, std::ofstream &outputFile, Metadata const &metadata) {
   // Write pixel data to outputFile
   const auto numcolors = pixelMap.size();
   std::string decimalString = std::to_string(numcolors);
-  outputFile.write(decimalString.c_str(), static_cast<std::streamsize>(decimalString.size()));
+  writeMetadataCPPM(outputFile, metadata, static_cast<int>(numcolors));
+  //outputFile.write(decimalString.c_str(), static_cast<std::streamsize>(decimalString.size()));
   for (const auto& [pixel, index] : pixelMap) {
     const auto r = static_cast<T>(pixel.r);
     const auto g = static_cast<T>(pixel.g);
