@@ -13,11 +13,16 @@
 
 template <typename T>
 struct Pixel {
-    T r, g, b;
+  T r, g, b;
 
-    bool operator==(Pixel<T> const & other) const {
-      return std::tie(r, g, b) == std::tie(other.r, other.g, other.b);
-    }
+  bool operator==(Pixel<T> const & other) const {
+    return std::tie(r, g, b) == std::tie(other.r, other.g, other.b);
+  }
+  bool operator<(Pixel<T> const & other) const {
+    if (r != other.r) { return r < other.r; }
+    if (g != other.g) { return g < other.g; }
+    return b < other.b;
+  }
     bool operator<(const Pixel &other) const {
       if (r != other.r) {return r < other.r;}
       if (g != other.g) {return g < other.g;}
@@ -25,8 +30,7 @@ struct Pixel {
 
     }
 };
-
-template <typename T>
+      template <typename T>
 struct Pixel_map {
     std::size_t operator()(Pixel<T> const & color) const {
       return std::hash<T>{}(color.r) ^ std::hash<T>{}(color.g) ^ std::hash<T>{}(color.b);
@@ -70,5 +74,14 @@ void AOSToBinary(std::ofstream & outputFile, std::vector<Pixel<T>> const & data)
   outputFile.write(reinterpret_cast<char const *>(tempData.data()),
                    static_cast<std::streamsize>(tempData.size() * sizeof(T)));
 }
+
+
+template <typename T>
+void AOSToBinary_(std::ofstream &outputFile, const T& data) {
+  // Write the single instance of T in binary to the output file
+  outputFile.write(reinterpret_cast<const char*>(&data), sizeof(T));
+}
+
+
 
 #endif  // IMAGEAOS_HPP
