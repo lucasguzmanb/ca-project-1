@@ -6,7 +6,7 @@
 
 
 // Test to resize images and compare with reference outputs
-TEST(utest_imgaos, ResizeAndCompare) {
+TEST(utest-imgaos, ResizeAndCompare) {
   // Define test cases
   struct TestCase {
       std::string inputFile;
@@ -29,15 +29,15 @@ TEST(utest_imgaos, ResizeAndCompare) {
   for (const auto& testCase : testCases) {
     std::ifstream inputFile = openInputFile(testCase.inputFile);
     Metadata inputMetadata = obtainMetadata(inputFile);
-    Metadata outputMetadata = inputMetadata;
-    outputMetadata.height = testCase.newHeight;
-    outputMetadata.width = testCase.newWidth;
+    Metadata newMetadata = inputMetadata;
+    newMetadata.height = testCase.newHeight;
+    newMetadata.width = testCase.newWidth;
 
     // Load input image
     std::vector<Pixel<uint8_t>> inputPixels = binaryToAOS<uint8_t>(inputFile, inputMetadata.width, inputMetadata.height);
 
     // Resize image
-    std::vector<int> newSize = {testCase.newWidth, testCase.newHeight};
+    std::vector<int> newSize = {newMetadata.width, newMetadata.height};
     std::vector<Pixel<uint8_t>> resizedPixels = resize<uint8_t>(inputPixels, inputMetadata, newSize);
 
     // Load reference output image
@@ -46,8 +46,8 @@ TEST(utest_imgaos, ResizeAndCompare) {
     std::vector<Pixel<uint8_t>> expectedPixels = binaryToAOS<uint8_t>(outputFile, outputMetadata.width, outputMetadata.height);
 
     // Validate the metadata matches expected output size
-    EXPECT_EQ(newSize[0], outputMetadata.width);
-    EXPECT_EQ(newSize[1], outputMetadata.height);
+    EXPECT_EQ(newMetadata.width, outputMetadata.width);
+    EXPECT_EQ(newMetadata.height, outputMetadata.height);
 
     // Validate each pixel
     ASSERT_EQ(resizedPixels.size(), expectedPixels.size());
