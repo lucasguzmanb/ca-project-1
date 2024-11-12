@@ -5,14 +5,6 @@
 #include <string>
 #include <vector>
 
-void print_arguments(Arguments const & arguments) {
-  std::cout << "input: " << arguments.input << "\n";
-  std::cout << "output: " << arguments.output << "\n";
-  std::cout << "operation: " << arguments.operation << "\n";
-  std::cout << "extra arguments:\n";
-  for (auto x : arguments.extra) { std::cout << x << '\n'; }
-}
-
 void check_minimum_args(int const argc) {
   if (argc < 4) {
     std::cerr << "Error: invalid number of arguments: " << argc - 1 << "\n";
