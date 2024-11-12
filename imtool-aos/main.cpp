@@ -52,6 +52,8 @@ int main(int const argc, char * argv[]) {
   // perform requested operation (8 or 16 bits)
   std::vector<Pixel<uint8_t>> outputPixels8;
   std::vector<Pixel<uint16_t>> outputPixels16;
+  // open output file
+  std::ofstream outputFile = openOutputFile(args.output);
   if (args.operation == "maxlevel") {
     if (isInputUint8) {
       if (args.extra[0] <= THRESHOLD) {
@@ -88,21 +90,23 @@ int main(int const argc, char * argv[]) {
       removeLFCaos<uint16_t>(outputPixels16, args.extra[0]);
     }
   } else if (args.operation == "compress") {
+    newMetadata.format = "C6";
+    writeMetadata(outputFile, newMetadata);
     if (isInputUint8) {
       std::cout << "compress8\n";
-      outputPixels8 = compress(inputPixels8, metadata);
+      compress(inputPixels8, outputFile);
 
     } else {
       std::cout << "compress16\n";
-      outputPixels16 = compress(inputPixels16, metadata);
+      compress(inputPixels16, outputFile);
     }
+    return 0;
   } else {
     std::cerr << "Error: unknown operation\n";
     exit(-1);
   }
 
-  // open output file
-  std::ofstream outputFile = openOutputFile(args.output);
+
 
   // write metadata
   writeMetadata(outputFile, newMetadata);

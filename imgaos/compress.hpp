@@ -7,68 +7,58 @@
 
 
 template <typename T>
-std::vector<Pixel<T>> compress(const std::vector<Pixel<T>> inputPixels, Metadata metadata) {
-    //initialize values
-    int const maxColorValue = metadata.maxColorValue;
-    std:: map<Pixel<T>, T> pixelMap = getColors(inputPixels);
-    std::vector<Pixel<T>> outputPixels = writeCompressedData(pixelMap, maxColorValue);
-    return outputPixels;
-
+void compress(const std::vector<Pixel<T>> &inputPixels, std::ofstream &outputFile) {
+    //int const maxColorValue = metadata.maxColorValue;
+    std:: map<Pixel<T>, uint32_t> pixelMap = getColors(inputPixels);
+    writeCompressedData(inputPixels,pixelMap, outputFile);
 }
 
 
 template <typename T>
-std::map<Pixel<T>, T> getColors(const std::vector<Pixel<T>>& inputPixels) {
-  std::map<Pixel<T>, T> pixelMap;
+std::map<Pixel<T>, uint32_t> getColors(const std::vector<Pixel<T>>& inputPixels) {
+  std::map<Pixel<T>, uint32_t> pixelMap;
   for (const auto& pixel : inputPixels) {
     // Check if the color is in the map
     if (pixelMap.find(pixel) == pixelMap.end()) {
       // Assign a new index to this color
-      T index = static_cast<T>(pixelMap.size());
+      auto index = static_cast<uint32_t>(pixelMap.size());
       pixelMap[pixel] = index;
     }
   }
   return pixelMap; // Return the pixel map
-}
+};
 
 
 
 template <typename T>
-std::vector<Pixel<T>> writeCompressedData(std::map<Pixel<T>, T> &pixelMap, int maxColorValue){
+void writeCompressedData(const std::vector<Pixel<T>>& inputPixels, std::map<Pixel<T>, uint32_t> &pixelMap, std::ofstream &outputFile) {
+  // Write pixel data to outputFile
+  const auto numcolors = pixelMap.size();
+  std::string decimalString = std::to_string(numcolors);
+  outputFile.write(decimalString.c_str(), static_cast<std::streamsize>(decimalString.size()));
+  for (const auto& [pixel, index] : pixelMap) {
+    const auto r = static_cast<T>(pixel.r);
+    const auto g = static_cast<T>(pixel.g);
+    const auto b = static_cast<T>(pixel.b);
+    AOSToBinary_(outputFile, r);
+    AOSToBinary_(outputFile, g);
+    AOSToBinary_(outputFile, b);
+  }
+
   constexpr int limitvalue = 255;
   constexpr int limitvalue2 = 65535;
-  std::vector<Pixel<T>> outputPixels;
-  // Write pixel data to outputPixels vector
-  for (const auto& [pixel, index] : pixelMap) {
-    // Store the pixel in the vector
-    if (maxColorValue <= limitvalue) {
-      // For 8-bit color depth
-      uint8_t r = static_cast<uint8_t>(pixel.r);
-      uint8_t g = static_cast<uint8_t>(pixel.g);
-      uint8_t b = static_cast<uint8_t>(pixel.b);
-      outputPixels.push_back(Pixel<T>{r, g, b}); // Add the pixel to the vector
-    } else {
-      // For higher color depths
-      outputPixels.push_back(pixel); // Add the pixel to the vector directly
-    }
-  }
-  // Write indices for the pixel data
-  for (const auto& [pixel, index] : pixelMap) {
+  for (std::size_t i = 0; i < inputPixels.size(); i++) {
+    auto it = pixelMap.find(inputPixels[i]);
+    uint32_t index = it->second;
     if (pixelMap.size() <= limitvalue) {
       uint8_t index8 = static_cast<uint8_t>(index);
-      outputPixels.push_back(Pixel<T>{index8, 0, 0}); // Store index as a pixel (dummy values for g and b)
+      AOSToBinary_(outputFile, index8);
     } else if (pixelMap.size() <= limitvalue2) {
-      uint8_t index8_high = static_cast<uint8_t>((index >> 8) & 0xFF);  // higher 8 bits
-      uint8_t index8_low = static_cast<uint8_t>(index & 0xFF);          // lower 8 bits
-      outputPixels.push_back(Pixel<T>{index8_high, index8_low, 0}); // Store index in two 8-bit channels
+      uint16_t index16 = static_cast<uint16_t>(index);
+      AOSToBinary_(outputFile, index16);
     } else {
-      uint8_t index8_high = static_cast<uint8_t>((index >> 16) & 0xFF); // highest 8 bits
-      uint8_t index8_mid = static_cast<uint8_t>((index >> 8) & 0xFF);   // middle 8 bits
-      uint8_t index8_low = static_cast<uint8_t>(index & 0xFF);          // lowest 8 bits
-      outputPixels.push_back(Pixel<T>{index8_high, index8_mid, index8_low}); // Store in three 8-bit channels
+      AOSToBinary_(outputFile, index); // Write full 32-bit index
+    }
     }
   }
-  return outputPixels; // Return the vector of output pixels
-};
-
 #endif //COMPRESS_HPP
