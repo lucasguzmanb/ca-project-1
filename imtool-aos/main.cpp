@@ -91,14 +91,13 @@ int main(int const argc, char * argv[]) {
     }
   } else if (args.operation == "compress") {
     newMetadata.format = "C6";
-    writeMetadata(outputFile, newMetadata);
+    //writeMetadata(outputFile, newMetadata);
     if (isInputUint8) {
       std::cout << "compress8\n";
-      compress(inputPixels8, outputFile);
-
+      compress(inputPixels8, outputFile, metadata);
     } else {
       std::cout << "compress16\n";
-      compress(inputPixels16, outputFile);
+      compress(inputPixels16, outputFile, metadata);
     }
     return 0;
   } else {
