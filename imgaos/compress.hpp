@@ -35,7 +35,7 @@ void writeCompressedData(const std::vector<Pixel<T>>& inputPixels, std::map<Pixe
   // Write pixel data to outputFile
   const auto numcolors = pixelMap.size();
   //std::string decimalString = std::to_string(numcolors);
-  writeMetadataCPPM(outputFile, metadata, static_cast<int>(numcolors));
+  writeMetadata(outputFile, metadata, static_cast<int>(numcolors));
   //outputFile.write(decimalString.c_str(), static_cast<std::streamsize>(decimalString.size()));
   for (const auto& [pixel, index] : pixelMap) {
     const auto r = static_cast<T>(pixel.r);
