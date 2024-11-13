@@ -33,13 +33,13 @@ std::ofstream openOutputFile(std::filesystem::path const & fileName) {
   return outputFile;
 }
 
-void writeMetadata(std::ofstream & outputFile, Metadata const & metadata, int const numColors) {
-  outputFile << metadata.format << ' ' << metadata.width << ' ' << metadata.height << ' '
-             << metadata.maxColorValue << ' ';
+void writeMetadata(std::ofstream & outputFile, Metadata const & metadata) {
+  outputFile << metadata.format << '\n'
+             << metadata.width << ' ' << metadata.height << '\n'
+             << metadata.maxColorValue << '\n';
+}
 
-  if (numColors != -1) {
-    outputFile << numColors << '\n';
-  } else {
-    outputFile << '\n';
-  }
+void writeMetadataCPPM(std::ofstream & outputFile, Metadata const & metadata, int const numColors) {
+  outputFile << metadata.format << ' ' << metadata.width << ' ' << metadata.height << ' '
+             << metadata.maxColorValue << ' ' << numColors << '\n';
 }

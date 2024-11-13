@@ -27,7 +27,9 @@ Metadata obtainMetadata(std::ifstream & inputFile);
 std::ifstream openInputFile(std::filesystem::path const & fileName);
 std::ofstream openOutputFile(std::filesystem::path const & fileName);
 
-void writeMetadata(std::ofstream & outputFile, Metadata const & metadata, int numColors = -1);
+void writeMetadata(std::ofstream & outputFile, Metadata const & metadata);
+
+void writeMetadataCPPM(std::ofstream & outputFile, Metadata const & metadata, int numColors);
 
 template <typename T>
 std::vector<T> readRawData(std::ifstream & inputFile, int const width, int const height) {
