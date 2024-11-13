@@ -38,3 +38,8 @@ void writeMetadata(std::ofstream & outputFile, Metadata const & metadata) {
              << metadata.width << ' ' << metadata.height << '\n'
              << metadata.maxColorValue << '\n';
 }
+
+void writeMetadataCPPM(std::ofstream & outputFile, Metadata const & metadata, int const numColors) {
+  outputFile << metadata.format << ' ' << metadata.width << ' ' << metadata.height << ' '
+             << metadata.maxColorValue << ' ' << numColors << '\n';
+}

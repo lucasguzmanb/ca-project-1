@@ -13,38 +13,34 @@
 
 template <typename T>
 struct Pixel {
-  T r, g, b;
+    T r, g, b;
 
-  bool operator==(Pixel<T> const & other) const {
-    return std::tie(r, g, b) == std::tie(other.r, other.g, other.b);
-  }
-  bool operator<(Pixel<T> const & other) const {
-    if (r != other.r) { return r < other.r; }
-    if (g != other.g) { return g < other.g; }
-    return b < other.b;
-  }
-    bool operator<(const Pixel &other) const {
-      if (r != other.r) {return r < other.r;}
-      if (g != other.g) {return g < other.g;}
+    bool operator==(Pixel<T> const & other) const {
+      return std::tie(r, g, b) == std::tie(other.r, other.g, other.b);
+    }
+
+    bool operator<(Pixel const & other) const {
+      if (r != other.r) { return r < other.r; }
+      if (g != other.g) { return g < other.g; }
       return b < other.b;
-
     }
 };
-      template <typename T>
+
+template <typename T>
 struct Pixel_map {
     std::size_t operator()(Pixel<T> const & color) const {
       return std::hash<T>{}(color.r) ^ std::hash<T>{}(color.g) ^ std::hash<T>{}(color.b);
     }
-  bool operator()(const Pixel<T>& a, const Pixel<T>& b) const {
-      if (a.r != b.r) return a.r < b.r;
-      if (a.g != b.g) return a.g < b.g;
+
+    bool operator()(Pixel<T> const & a, Pixel<T> const & b) const {
+      if (a.r != b.r) { return a.r < b.r; }
+      if (a.g != b.g) { return a.g < b.g; }
       return a.b < b.b;
     }
 };
 
 template <typename T>
 std::vector<Pixel<T>> binaryToAOS(std::ifstream & inputFile, int const width, int const height) {
-
   std::vector<T> tempData = readRawData<T>(inputFile, width, height);
   std::vector<Pixel<T>> data(static_cast<std::size_t>(width * height));
 
@@ -75,13 +71,11 @@ void AOSToBinary(std::ofstream & outputFile, std::vector<Pixel<T>> const & data)
                    static_cast<std::streamsize>(tempData.size() * sizeof(T)));
 }
 
-
 template <typename T>
-void AOSToBinary_(std::ofstream &outputFile, const T& data) {
+void AOSToBinary_(std::ofstream & outputFile, T const & data) {
   // Write the single instance of T in binary to the output file
-  outputFile.write(reinterpret_cast<const char*>(&data), sizeof(T));
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+  outputFile.write(reinterpret_cast<char const *>(&data), sizeof(T));
 }
-
-
 
 #endif  // IMAGEAOS_HPP

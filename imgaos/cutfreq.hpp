@@ -125,6 +125,13 @@ void removeLFCaos(std::vector<Pixel<T>>& pixels, int n) {
     ++frequency[pixel];
   }
 
+  // Check if n is greater than the number of unique colors
+  if (n >= static_cast<int>(frequency.size())) {
+    std::fill(pixels.begin(), pixels.end(), Pixel<T>{0, 0, 0});
+    std::cout << "All pixels changed to black as n >= unique colors.\n";
+    return;
+  }
+
   auto end = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> duration = end - start;
   std::cout << "Frequency map: " << duration.count() << "\n";
