@@ -29,14 +29,13 @@ int main(int const argc, char * argv[]) {
   // check if file is in P6 format
   if (metadata.format != "P6") {
     std::cerr << "Error: file is not in .ppm format\n";
-    exit(-1);
+    exit(EXIT_FAILURE);
   }
 
   if (args.operation == "info") {
     info(args, metadata);
     return 0;
   }
-
 
   constexpr int THRESHOLD = 255;
   bool const isInputUint8 = metadata.maxColorValue <= THRESHOLD;
@@ -94,18 +93,16 @@ int main(int const argc, char * argv[]) {
     //writeMetadata(outputFile, newMetadata);
     if (isInputUint8) {
       std::cout << "compress8\n";
-      compress(inputPixels8, outputFile, metadata);
+      compress(inputPixels8, outputFile, newMetadata);
     } else {
       std::cout << "compress16\n";
-      compress(inputPixels16, outputFile, metadata);
+      compress(inputPixels16, outputFile, newMetadata);
     }
     return 0;
   } else {
     std::cerr << "Error: unknown operation\n";
-    exit(-1);
+    exit(EXIT_FAILURE);
   }
-
-
 
   // write metadata
   writeMetadata(outputFile, newMetadata);
@@ -116,8 +113,6 @@ int main(int const argc, char * argv[]) {
   } else {
     AOSToBinary<uint16_t>(outputFile, outputPixels16);
   }
-  inputFile.close();
-  outputFile.close();
 
   return 0;
 }
