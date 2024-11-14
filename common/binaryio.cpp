@@ -60,3 +60,13 @@ void writeMetadataCPPM(std::ofstream & outputFile, Metadata const & metadata, in
   outputFile << metadata.format << ' ' << metadata.width << ' ' << metadata.height << ' '
              << metadata.maxColorValue << ' ' << numColors << '\n';
 }
+
+void checkFileFormat(std::string const & format) {
+  /*
+   * check if file is in P6 format
+   */
+  if (format != "P6") {
+    std::cerr << "Error: file is not in .ppm format\n";
+    exit(EXIT_FAILURE);
+  }
+}

@@ -47,4 +47,6 @@ std::vector<T> readRawData(std::ifstream & inputFile, int const width, int const
   return tempData;
 }
 
+void checkFileFormat(std::string const & format);
+
 #endif  // BINARYIO_HPP

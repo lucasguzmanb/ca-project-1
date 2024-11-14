@@ -26,11 +26,7 @@ int main(int const argc, char * argv[]) {
 
   Metadata const metadata = obtainMetadata(inputFile);
   Metadata newMetadata    = metadata;
-  // check if file is in P6 format
-  if (metadata.format != "P6") {
-    std::cerr << "Error: file is not in .ppm format\n";
-    exit(EXIT_FAILURE);
-  }
+  checkFileFormat(metadata.format);
 
   if (args.operation == "info") {
     info(args, metadata);
