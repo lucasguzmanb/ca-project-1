@@ -44,45 +44,73 @@ Arguments parse_args(std::vector<std::string> const & argv) {
   return args;
 }
 
-void check_args(Arguments const & args) {
+void checkArgsOperation(Arguments const & args) {
   /*
-   * check if the provided program parameters are correct and can be used or not
+   * check if the operation is valid
    */
   if (args.operation != "info" && args.operation != "maxlevel" && args.operation != "resize" &&
       args.operation != "cutfreq" && args.operation != "compress") {
     std::cerr << "Error: invalid operation: " << args.operation << "\n";
     exit(EXIT_FAILURE);
   }
+}
+
+void checkArgsExtraEmpty(Arguments const & args) {
+  /*
+   * check if the extra arguments are correct for the operation (case no extra arguments)
+   */
+  if (args.operation != "info" && args.operation != "compress") {
+    std::cerr << "Error: invalid number of extra arguments for " << args.operation << ": "
+              << args.extra.size() << "\n";
+    exit(EXIT_FAILURE);
+  }
+}
+
+void checkArgsExtra1(Arguments const & args) {
+  /*
+   * check if the extra arguments are correct for the operation (case 1 extra argument)
+   */
+  if (args.operation != "maxlevel" && args.operation != "cutfreq") {
+    std::cerr << "Error: invalid number of extra arguments for " << args.operation << ": "
+              << args.extra.size() << "\n";
+    exit(EXIT_FAILURE);
+  } else if (args.operation == "maxlevel" && (args.extra[0] < 0 || args.extra[0] > 65535)) {
+    std::cerr << "Error: invalid maxlevel: " << args.extra[0] << "\n";
+    exit(EXIT_FAILURE);
+  } else if (args.operation == "cutfreq" && args.extra[0] <= 0) {
+    std::cerr << "Error: invalid cutfreq: " << args.extra[0] << "\n";
+    exit(EXIT_FAILURE);
+  }
+}
+
+void checkArgsExtra2(Arguments const & args) {
+  /*
+   * check if the extra arguments are correct for the operation (case 2 extra arguments)
+   */
+  if (args.operation != "resize") {
+    std::cerr << "Error: invalid number of extra arguments for " << args.operation << ": "
+              << args.extra.size() << "\n";
+    exit(EXIT_FAILURE);
+  } else if (args.extra[0] <= 0) {
+    std::cerr << "Error: invalid resize width: " << args.extra[0] << "\n";
+    exit(EXIT_FAILURE);
+  } else if (args.extra[1] <= 0) {
+    std::cerr << "Error: invalid resize height: " << args.extra[1] << "\n";
+    exit(EXIT_FAILURE);
+  }
+}
+
+void check_args(Arguments const & args) {
+  /*
+   * check if the provided program parameters are correct and can be used or not
+   */
+  checkArgsOperation(args);
   if (args.extra.empty()) {
-    if (args.operation != "info" && args.operation != "compress") {
-      std::cerr << "Error: invalid number of extra arguments for " << args.operation << ": "
-                << args.extra.size() << "\n";
-      exit(EXIT_FAILURE);
-    }
+    checkArgsExtraEmpty(args);
   } else if (args.extra.size() == 1) {
-    if (args.operation != "maxlevel" && args.operation != "cutfreq") {
-      std::cerr << "Error: invalid number of extra arguments for " << args.operation << ": "
-                << args.extra.size() << "\n";
-      exit(EXIT_FAILURE);
-    } else if (args.operation == "maxlevel" && (args.extra[0] < 0 || args.extra[0] > 65535)) {
-      std::cerr << "Error: invalid maxlevel: " << args.extra[0] << "\n";
-      exit(EXIT_FAILURE);
-    } else if (args.operation == "cutfreq" && args.extra[0] <= 0) {
-      std::cerr << "Error: invalid cutfreq: " << args.extra[0] << "\n";
-      exit(EXIT_FAILURE);
-    }
+    checkArgsExtra1(args);
   } else if (args.extra.size() == 2) {
-    if (args.operation != "resize") {
-      std::cerr << "Error: invalid number of extra arguments for " << args.operation << ": "
-                << args.extra.size() << "\n";
-      exit(EXIT_FAILURE);
-    } else if (args.extra[0] <= 0) {
-      std::cerr << "Error: invalid resize width: " << args.extra[0] << "\n";
-      exit(EXIT_FAILURE);
-    } else if (args.extra[1] <= 0) {
-      std::cerr << "Error: invalid resize height: " << args.extra[1] << "\n";
-      exit(EXIT_FAILURE);
-    }
+    checkArgsExtra2(args);
   } else {
     std::cerr << "Error: invalid number of extra arguments for " << args.operation << ": "
               << args.extra.size() << "\n";
@@ -90,7 +118,7 @@ void check_args(Arguments const & args) {
   }
 }
 
-Arguments checkAndParseArgs(const std::vector<std::string>& args_vector) {
+Arguments checkAndParseArgs(std::vector<std::string> const & args_vector) {
   /*
    * check is provided parameters are correct and create object of arguments
    * return this object
