@@ -3,12 +3,6 @@
 #include <filesystem>
 #include <gtest/gtest.h>
 
-// Define testcases
-struct TestCase {
-    std::filesystem::path inputFile;
-    Metadata info;
-};
-
 namespace {
   void compareMetadata(Metadata const & expected, Metadata const & actual) {
     EXPECT_EQ(expected.format, actual.format);
@@ -20,6 +14,12 @@ namespace {
 
 // Test to get metadata information
 TEST(info_test, GetMetadataInfo) {
+  // Define testcases
+  struct TestCase {
+      std::filesystem::path inputFile;
+      Metadata info;
+  };
+
   std::vector<TestCase> const testCases = {
     {.inputFile = "input/deer-small.ppm", .info = Metadata("P6",  267,  200, 255)},
     {.inputFile = "input/deer-large.ppm", .info = Metadata("P6", 8000, 6000, 255)},
