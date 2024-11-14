@@ -1,14 +1,14 @@
-#ifndef RESIZE_HPP
-#define RESIZE_HPP
+#ifndef RESIZE_SOA_HPP
+#define RESIZE_SOA_HPP
 
-#include <iostream>
-#include <fstream>
 #include <vector>
 #include "imagesoa.hpp"
 
-
+template <typename T>
+ImageSOA<T> resize(ImageSOA<T> pixels, Metadata & metadata, std::vector<int> const & size);
 
 template <typename T>
-ImageSOA<T> resize(ImageSOA<T> pixels, Metadata metadata, std::vector<int> size);
+T interpolation(T color1, T color2, double frac);
 
-#endif // RESIZE_HPP
+
+#endif // RESIZE_SOA_HPP
