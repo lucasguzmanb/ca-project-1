@@ -4,13 +4,19 @@
 
 template <typename T>
 ImageSOA<T> binaryToSOA(std::ifstream & inputFile, int const width, int const height) {
-
+  /*
+   * read binary data from binary file, crete vector that stores colour values consequently
+   * using technique of structure of arrays, create such structure,
+   * that stores arrays for red, green and blue colour values of pixels, return this vector
+   */
   std::vector<T> tempData = readRawData<T>(inputFile, width, height);
   ImageSOA<T> data(static_cast<std::size_t>(width * height));
 
   // Convert the raw data to SOA
   for (std::size_t i = 0, j = 0; i < data.r.size(); ++i, j += 3) {
     if (sizeof(T) == 2){
+      // perform byte swapping in case of 16 bits(2 bytes) number
+      // without it, the correct picture cannot be obtained
       data.r[i] = static_cast<T>((tempData[j] << 8) | (tempData[j] >> 8));
       data.g[i] = static_cast<T>((tempData[j+1] << 8) | (tempData[j+1] >> 8));
       data.b[i] = static_cast<T>((tempData[j+2] << 8) | (tempData[j+2] >> 8));
@@ -27,11 +33,17 @@ ImageSOA<T> binaryToSOA(std::ifstream & inputFile, int const width, int const he
 
 template <typename T>
 void SOAToBinary(std::ofstream & outputFile, ImageSOA<T> const & data) {
+  /*
+   * read structure that stores vectors of pixels colour values(each for red, green, blue),
+   * write data to binary file
+   */
   // Convert the SOA data to raw data
   std::vector<T> tempData(data.r.size() * 3);
 
   for (std::size_t i = 0, j = 0; i < data.r.size(); ++i, j += 3) {
     if (sizeof(T) == 2){
+      // perform byte swapping in case of 16 bits(2 bytes) number
+      // without it, the correct picture cannot be obtained
       tempData[j]     = static_cast<T>((data.r[i] << 8) | (data.r[i] >> 8));
       tempData[j + 1] = static_cast<T>((data.g[i] << 8) | (data.g[i] >> 8));
       tempData[j + 2] = static_cast<T>((data.b[i] << 8) | (data.b[i] >> 8));
@@ -49,7 +61,7 @@ void SOAToBinary(std::ofstream & outputFile, ImageSOA<T> const & data) {
                    static_cast<std::streamsize>(tempData.size() * sizeof(T)));
 }
 
-
+// explicitly tell the compiler to create template specialization of functions for different cases
 template ImageSOA<uint8_t> binaryToSOA(std::ifstream & inputFile, int const width, int const height);
 template ImageSOA<uint16_t> binaryToSOA(std::ifstream & inputFile, int const width, int const height);
 template void SOAToBinary(std::ofstream & outputFile, ImageSOA<uint8_t> const & data);

@@ -3,12 +3,23 @@
 // Function for pixel interpolation
 template <typename T>
 T interpolation(T color1, T color2, double frac) {
+  /*
+   * perform linear interpolation and return its result
+   * Linear interpolation formula:
+   *      y = y1 + (x - x1) * (y2 - y1) / (x2 - x1),
+   * perform linear interpolation with frac being quotient of x - x1 and x2 - x1
+   * where xi - coordinates along certain axes and yi - color values
+   */
   return static_cast<T> (color1 + (color2 - color1) * frac);
 }
 
 template <typename T>
 ImageSOA<T> resize(ImageSOA<T> pixels, Metadata metadata, std::vector<int> size){
-
+  /*
+   * perform scaling of the size of the picture to a certain width and height
+   * use linear interpolation for this
+   * return structure storing vectors of pixels colour values of new resized photo
+   */
   // Define the new dimensions
   int newWidth = size[0], newHeight = size[1];
   ImageSOA<T> newPixels;
@@ -28,18 +39,20 @@ ImageSOA<T> resize(ImageSOA<T> pixels, Metadata metadata, std::vector<int> size)
       double x_diff = j * (double)metadata.width / newWidth - x_l;
       double y_diff = i * (double)metadata.height / newHeight - y_l;
 
+      // compute new red value
       c1 = interpolation<T>(pixels.r[static_cast<size_t>(y_l * metadata.width + x_l)], pixels.r[static_cast<size_t>(y_l * metadata.width + x_h)], x_diff);
       c2 = interpolation<T>(pixels.r[static_cast<size_t>(y_h * metadata.width + x_l)], pixels.r[static_cast<size_t>(y_h * metadata.width + x_h)], x_diff);
       newPixels.r[static_cast<size_t>(i * newWidth + j)] = interpolation<T>(c1, c2, y_diff);
 
+      // compute new green value
       c1 = interpolation<T>(pixels.g[static_cast<size_t>(y_l * metadata.width + x_l)], pixels.g[static_cast<size_t>(y_l * metadata.width + x_h)], x_diff);
       c2 = interpolation<T>(pixels.g[static_cast<size_t>(y_h * metadata.width + x_l)], pixels.g[static_cast<size_t>(y_h * metadata.width + x_h)], x_diff);
       newPixels.g[static_cast<size_t>(i * newWidth + j)] = interpolation<T>(c1, c2, y_diff);
 
+      // compute new blue value
       c1 = interpolation<T>(pixels.b[static_cast<size_t>(y_l * metadata.width + x_l)], pixels.b[static_cast<size_t>(y_l * metadata.width + x_h)], x_diff);
       c2 = interpolation<T>(pixels.b[static_cast<size_t>(y_h * metadata.width + x_l)], pixels.b[static_cast<size_t>(y_h * metadata.width + x_h)], x_diff);
       newPixels.b[static_cast<size_t>(i * newWidth + j)] = interpolation<T>(c1, c2, y_diff);
-
     }
   }
   return newPixels;

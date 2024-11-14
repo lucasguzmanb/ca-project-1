@@ -33,6 +33,10 @@ void writeMetadataCPPM(std::ofstream & outputFile, Metadata const & metadata, in
 
 template <typename T>
 std::vector<T> readRawData(std::ifstream & inputFile, int const width, int const height) {
+  /*
+   * by the input file stream and its size
+   * create vector that stores the sequence of pixels of picture and return it
+   */
   // Create a vector of raw data to store the binary data and read everything at once
   auto dataSize = static_cast<std::size_t>(width * height * 3);
   std::vector<T> tempData(dataSize);
