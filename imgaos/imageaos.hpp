@@ -46,9 +46,16 @@ std::vector<Pixel<T>> binaryToAOS(std::ifstream & inputFile, int const width, in
 
   // Convert the raw data to AOS
   for (std::size_t i = 0, j = 0; i < data.size(); ++i, j += 3) {
-    data[i].r = tempData[j];
-    data[i].g = tempData[j + 1];
-    data[i].b = tempData[j + 2];
+    if (sizeof(T) == 2){
+      data[i].r = static_cast<T>((tempData[j] << 8) | (tempData[j] >> 8));
+      data[i].g = static_cast<T>((tempData[j+1] << 8) | (tempData[j+1] >> 8));
+      data[i].b = static_cast<T>((tempData[j+2] << 8) | (tempData[j+2] >> 8));
+    }
+    else {
+      data[i].r = tempData[j];
+      data[i].g = tempData[j + 1];
+      data[i].b = tempData[j + 2];
+    }
   }
 
   return data;
@@ -60,9 +67,17 @@ void AOSToBinary(std::ofstream & outputFile, std::vector<Pixel<T>> const & data)
   std::vector<T> tempData(data.size() * 3);
 
   for (std::size_t i = 0, j = 0; i < data.size(); ++i, j += 3) {
-    tempData[j]     = data[i].r;
-    tempData[j + 1] = data[i].g;
-    tempData[j + 2] = data[i].b;
+    if (sizeof(T) == 2){
+      tempData[j]     = static_cast<T>((data[i].r << 8) | (data[i].r >> 8));
+      tempData[j + 1] = static_cast<T>((data[i].g << 8) | (data[i].g >> 8));
+      tempData[j + 2] = static_cast<T>((data[i].b << 8) | (data[i].b >> 8));
+    }
+    else {
+      tempData[j]     = data[i].r;
+      tempData[j + 1] = data[i].g;
+      tempData[j + 2] = data[i].b;
+    }
+
   }
 
   // Write the raw data to the binary file
