@@ -28,7 +28,7 @@ Arguments parse_args(std::vector<std::string> const & argv) {
   for (size_t i = 3; i < argv.size(); ++i) {
     try {
       // Try to convert the parameter to integer
-      int num = std::stoi(argv[i]);
+      int const num = std::stoi(argv[i]);
       if (std::to_string(num) != argv[i]) {
         // To ensure arguments like "123hello" aren't valid since stoi returns 123
         throw std::invalid_argument("Argument is not a valid integer");
@@ -74,10 +74,13 @@ void checkArgsExtra1(Arguments const & args) {
     std::cerr << "Error: invalid number of extra arguments for " << args.operation << ": "
               << args.extra.size() << "\n";
     exit(EXIT_FAILURE);
-  } else if (args.operation == "maxlevel" && (args.extra[0] < 0 || args.extra[0] > 65535)) {
+  }
+  if (constexpr int THRESHOLD = 65535;
+      args.operation == "maxlevel" && (args.extra[0] < 0 || args.extra[0] > THRESHOLD)) {
     std::cerr << "Error: invalid maxlevel: " << args.extra[0] << "\n";
     exit(EXIT_FAILURE);
-  } else if (args.operation == "cutfreq" && args.extra[0] <= 0) {
+  }
+  if (args.operation == "cutfreq" && args.extra[0] <= 0) {
     std::cerr << "Error: invalid cutfreq: " << args.extra[0] << "\n";
     exit(EXIT_FAILURE);
   }
