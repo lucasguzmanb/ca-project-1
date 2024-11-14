@@ -46,7 +46,6 @@ void writeCompressedData(const std::vector<Pixel<T>>& inputPixels, std::map<Pixe
     AOSToBinary_(outputFile, g);
     AOSToBinary_(outputFile, b);
   }
-
   constexpr int limitvalue = 255;
   constexpr int limitvalue2 = 65535;
   for (std::size_t i = 0; i < inputPixels.size(); i++) {
@@ -59,7 +58,8 @@ void writeCompressedData(const std::vector<Pixel<T>>& inputPixels, std::map<Pixe
       uint16_t index16 = static_cast<uint16_t>(index);
       AOSToBinary_(outputFile, index16);
     } else {
-      AOSToBinary_(outputFile, index); // Write full 32-bit index
+      //AOSToBinary_(outputFile, index);
+      outputFile.write(reinterpret_cast<char const *>(&index), sizeof(uint32_t));
     }
     }
   }
