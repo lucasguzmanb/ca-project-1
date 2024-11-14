@@ -6,6 +6,9 @@
 #include <vector>
 
 void check_minimum_args(int const argc) {
+  /*
+   * check the amount of arguments passed to the program
+   */
   if (argc < 4) {
     std::cerr << "Error: invalid number of arguments: " << argc - 1 << "\n";
     exit(EXIT_FAILURE);
@@ -13,6 +16,11 @@ void check_minimum_args(int const argc) {
 }
 
 Arguments parse_args(std::vector<std::string> const & argv) {
+  /*
+   * by the vector of arguments, create object of arguments
+   * object stores input and output filenames, operation to be performed
+   * and also additional parameters(depends on each function)
+   */
   Arguments args;
   args.input     = argv[0];
   args.output    = argv[1];
@@ -37,6 +45,9 @@ Arguments parse_args(std::vector<std::string> const & argv) {
 }
 
 void check_args(Arguments const & args) {
+  /*
+   * check if the provided program parameters are correct and can be used or not
+   */
   if (args.operation != "info" && args.operation != "maxlevel" && args.operation != "resize" &&
       args.operation != "cutfreq" && args.operation != "compress") {
     std::cerr << "Error: invalid operation: " << args.operation << "\n";
@@ -80,6 +91,10 @@ void check_args(Arguments const & args) {
 }
 
 Arguments checkAndParseArgs(const std::vector<std::string>& args_vector) {
+  /*
+   * check is provided parameters are correct and create object of arguments
+   * return this object
+   */
   Arguments args = parse_args(args_vector);
   check_args(args);
   return args;
