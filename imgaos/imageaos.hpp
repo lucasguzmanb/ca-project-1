@@ -32,50 +32,22 @@ struct Pixel_map {
       return std::hash<T>{}(color.r) ^ std::hash<T>{}(color.g) ^ std::hash<T>{}(color.b);
     }
 
-    bool operator()(Pixel<T> const & a, Pixel<T> const & b) const {
-      if (a.r != b.r) { return a.r < b.r; }
-      if (a.g != b.g) { return a.g < b.g; }
-      return a.b < b.b;
+    bool operator()(Pixel<T> const & pixel1, Pixel<T> const & pixel2) const {
+      if (pixel1.r != pixel2.r) { return pixel1.r < pixel2.r; }
+      if (pixel1.g != pixel2.g) { return pixel1.g < pixel2.g; }
+      return pixel1.b < pixel2.b;
     }
 };
 
 template <typename T>
-std::vector<Pixel<T>> binaryToAOS(std::ifstream & inputFile, int const width, int const height) {
-  std::vector<T> tempData = readRawData<T>(inputFile, width, height);
-  std::vector<Pixel<T>> data(static_cast<std::size_t>(width * height));
-
-  // Convert the raw data to AOS
-  for (std::size_t i = 0, j = 0; i < data.size(); ++i, j += 3) {
-    data[i].r = tempData[j];
-    data[i].g = tempData[j + 1];
-    data[i].b = tempData[j + 2];
-  }
-
-  return data;
-}
+std::vector<Pixel<T>> binaryToAOS(std::ifstream & inputFile, int width, int height);
 
 template <typename T>
-void AOSToBinary(std::ofstream & outputFile, std::vector<Pixel<T>> const & data) {
-  // Convert the AOS data to raw data
-  std::vector<T> tempData(data.size() * 3);
-
-  for (std::size_t i = 0, j = 0; i < data.size(); ++i, j += 3) {
-    tempData[j]     = data[i].r;
-    tempData[j + 1] = data[i].g;
-    tempData[j + 2] = data[i].b;
-  }
-
-  // Write the raw data to the binary file
-  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-  outputFile.write(reinterpret_cast<char const *>(tempData.data()),
-                   static_cast<std::streamsize>(tempData.size() * sizeof(T)));
-}
+void AOSToBinary(std::ofstream & outputFile, std::vector<Pixel<T>> const & data);
 
 template <typename T>
-void AOSToBinary_(std::ofstream & outputFile, T const & data) {
-  // Write the single instance of T in binary to the output file
-  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-  outputFile.write(reinterpret_cast<char const *>(&data), sizeof(T));
-}
+void AOSToBinary_(std::ofstream & outputFile, T const & data);
+
+
 
 #endif  // IMAGEAOS_HPP
