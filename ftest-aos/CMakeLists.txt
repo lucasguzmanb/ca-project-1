@@ -1,8 +1,8 @@
 add_test(NAME ftest-aos-maxlevel
-        COMMAND imtool-aos "${CMAKE_CURRENT_SOURCE_DIR}/input/deer-small.ppm" "${CMAKE_CURRENT_SOURCE_DIR}/output/deer-small-aos.ppm" maxlevel 5535)
+        COMMAND imtool-aos "${CMAKE_CURRENT_SOURCE_DIR}/input/prueba.ppm" maxlevel 5535)
 add_test(NAME ftest-aos-cutfreq
-        COMMAND imtool-aos "${CMAKE_CURRENT_SOURCE_DIR}/input/deer-small.ppm" "${CMAKE_CURRENT_SOURCE_DIR}/output/deer-small-aos.ppm" cutfreq 2000)
+        COMMAND imtool-aos "${CMAKE_CURRENT_SOURCE_DIR}/input/prueba.ppm" cutfreq 2000)
 add_test(NAME ftest-aos-resize
-        COMMAND imtool-aos "${CMAKE_CURRENT_SOURCE_DIR}/input/deer-small.ppm" "${CMAKE_CURRENT_SOURCE_DIR}/output/deer-small-aos.ppm" resize 200 200)
+        COMMAND imtool-aos "${CMAKE_CURRENT_SOURCE_DIR}/input/prueba.ppm" resize 200 200)
 add_test(NAME ftest-aos-compress
-        COMMAND imtool-aos "${CMAKE_CURRENT_SOURCE_DIR}/input/deer-small.ppm" "${CMAKE_CURRENT_SOURCE_DIR}/output/deer-small-aos.ppm" compress)
+        COMMAND imtool-aos "${CMAKE_CURRENT_SOURCE_DIR}/input/prueba.ppm" compress)
