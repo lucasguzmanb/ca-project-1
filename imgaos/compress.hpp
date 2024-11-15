@@ -6,14 +6,12 @@
 #include "common/binaryio.hpp"
 #include <map>
 
-
 template <typename T>
 void compress(const std::vector<Pixel<T>> &inputPixels, std::ofstream &outputFile, Metadata const &metadata) {
     //int const maxColorValue = metadata.maxColorValue;
     std:: map<Pixel<T>, uint32_t> pixelMap = getColors(inputPixels);
     writeCompressedData(inputPixels,pixelMap, outputFile, metadata);
 }
-
 
 template <typename T>
 std::map<Pixel<T>, uint32_t> getColors(const std::vector<Pixel<T>>& inputPixels) {
@@ -28,8 +26,6 @@ std::map<Pixel<T>, uint32_t> getColors(const std::vector<Pixel<T>>& inputPixels)
   }
   return pixelMap; // Return the pixel map
 };
-
-
 
 template <typename T>
 void writeCompressedData(const std::vector<Pixel<T>>& inputPixels, std::map<Pixel<T>, uint32_t> &pixelMap, std::ofstream &outputFile, Metadata const &metadata) {
