@@ -9,11 +9,11 @@
    * where xi - coordinates along certain axes and yi - color values
  */
 template <typename T>
-Pixel<T> interpolation(Pixel<T> c1, Pixel<T> c2, double frac) {
-  Pixel<T> result;
-  result.r = static_cast<T>(c1.r + ((c2.r - c1.r) * frac));
-  result.g = static_cast<T>(c1.g + ((c2.g - c1.g) * frac));
-  result.b = static_cast<T>(c1.b + ((c2.b - c1.b) * frac));
+Pixel<T> interpolation(Pixel<T> color1, Pixel<T> color2, double frac) {
+  Pixel<T> result{};
+  result.r = static_cast<T>(color1.r + ((color2.r - color1.r) * frac));
+  result.g = static_cast<T>(color1.g + ((color2.g - color1.g) * frac));
+  result.b = static_cast<T>(color1.b + ((color2.b - color1.b) * frac));
   return result;
 }
 
@@ -36,8 +36,8 @@ template <typename T>
 std::vector<Pixel<T> > resize(std::vector<Pixel<T> > pixels, Metadata const & metadata,
                              std::vector<int> const & size){
 
-  int newWidth = size[0];
-  int newHeight = size[1];
+  int const newWidth = size[0];
+  int const newHeight = size[1];
   std::vector<Pixel<T> > newPixels(static_cast<size_t>(newWidth * newHeight));
   Pixel<T> color1{};
   Pixel<T> color2{};

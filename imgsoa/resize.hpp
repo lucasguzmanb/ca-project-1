@@ -1,8 +1,6 @@
 #ifndef RESIZE_HPP
 #define RESIZE_HPP
 
-#include <iostream>
-#include <fstream>
 #include <vector>
 #include "imagesoa.hpp"
 
@@ -24,5 +22,12 @@ struct coordinates {
 
 template <typename T>
 ImageSOA<T> resize(ImageSOA<T> pixels, Metadata const & metadata, std::vector<int> const & size);
+
+template <typename T>
+T interpolate(T color1, T color2, double frac);
+
+template <typename T>
+T interpolation(std::vector<T> &colorPixels, coordinates coordinate,
+                   std::vector<int> const & widths, std::vector<double> const & diff);
 
 #endif // RESIZE_HPP
