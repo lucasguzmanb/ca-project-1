@@ -69,14 +69,15 @@ int main(int const argc, char * argv[]) {
     }
     newMetadata.maxColorValue = args.extra[0];
   } else if (args.operation == "resize") {
-    newMetadata.width  = args.extra[0];
-    newMetadata.height = args.extra[1];
+
     if (isInputUint8) {
       outputPixels8 = resize<uint8_t>(inputPixels8, newMetadata, args.extra);
     } else {
       outputPixels16 = resize<uint16_t>(inputPixels16, newMetadata, args.extra);
     }
-  } else if (args.operation == "cutfreq") {
+    newMetadata.width  = args.extra[0];
+    newMetadata.height = args.extra[1];
+  } /*else if (args.operation == "cutfreq") {
     if (isInputUint8) {
       outputPixels8 = inputPixels8;
       removeLFCaos<uint8_t>(outputPixels8, args.extra[0]);
@@ -84,7 +85,7 @@ int main(int const argc, char * argv[]) {
       outputPixels16 = inputPixels16;
       removeLFCaos<uint16_t>(outputPixels16, args.extra[0]);
     }
-  } else if (args.operation == "compress") {
+  } */ else if (args.operation == "compress") {
     newMetadata.format = "C6";
     // writeMetadata(outputFile, newMetadata);
     if (isInputUint8) {

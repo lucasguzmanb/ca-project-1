@@ -10,7 +10,7 @@
 // Function for pixel interpolation
 
 template <typename T>
-std::vector<Pixel<T>> resize(std::vector<Pixel<T> > pixels, Metadata metadata,
+std::vector<Pixel<T>> resize(std::vector<Pixel<T> > pixels, Metadata const & metadata,
                              std::vector<int> const & size);
 
 #endif // RESIZE_HPP
