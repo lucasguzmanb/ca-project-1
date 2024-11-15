@@ -50,7 +50,7 @@ ImageSOA<T> resize(ImageSOA<T> pixels, Metadata const & metadata, std::vector<in
       int const y_h = std::min(y_l + 1, metadata.height - 1);  // To avoid out-of-bounds access
       double const x_diff = (j * static_cast<double>(metadata.width) / newWidth) - x_l;
       double const y_diff = (i * static_cast<double>(metadata.height) / newHeight) - y_l;
-      coordinates const coordinate = {j, i, x_l, y_l, x_h, y_h};
+      coordinates const coordinate = {.j=j, .i=i, .x_l=x_l, .y_l=y_l, .x_h=x_h, .y_h=y_h};
       std::vector<int> const widths = {metadata.width, newWidth};
       std::vector<double> const diff = {x_diff, y_diff};
       // compute new red value
