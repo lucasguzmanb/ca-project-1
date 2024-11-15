@@ -65,10 +65,6 @@ private:
 
     // Comparator function for sorting pixels based on the current axis
   [[nodiscard]] static bool comparator(std::vector<int> const &pixels, int const axis) {
-      if (pixels.size() != 2) {
-        throw std::invalid_argument("The vector must contain exactly two pixel values.");
-      }
-
       switch (axis) {
         case 0: return extractRed(pixels[0]) < extractRed(pixels[1]);
         case 1: return extractGreen(pixels[0]) < extractGreen(pixels[1]);
@@ -133,7 +129,7 @@ template <typename T>
 void removeLFCsoa(ImageSOA<T>& pixels, int n) {
     std::map<int, int> frequency;
     for (size_t i = 0; i < pixels.size(); ++i) {
-        int pixel = (pixels.r[i] << sixteen) | (pixels.g[i] << eight) | pixels.b[i]; // Pack RGB
+        int const pixel = (pixels.r[i] << sixteen) | (pixels.g[i] << eight) | pixels.b[i]; // Pack RGB
         ++frequency[pixel];
     }
     // Handle case where n >= number of unique colors
@@ -158,7 +154,7 @@ void removeLFCsoa(ImageSOA<T>& pixels, int n) {
     }
     // Step 6: Replace colors in the original image
     for (size_t i = 0; i < pixels.size(); ++i) {
-        int pixel = (pixels.r[i] << sixteen) | (pixels.g[i] << eight) | pixels.b[i];
+        int const pixel = (pixels.r[i] << sixteen) | (pixels.g[i] << eight) | pixels.b[i];
         auto replacement = replacementMap.find(pixel);
         if (replacement != replacementMap.end()) {
             int const newPixel = replacement->second;
