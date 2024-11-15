@@ -16,8 +16,8 @@ template <typename T>
 std::map<std::tuple<T,T,T>, uint32_t> getColors(const ImageSOA<T> &inputPixels) {
   std::map<std::tuple<T,T,T>, uint32_t> pixelMap;
   for (std::size_t i = 0; i < inputPixels.size(); i++) {
-    std::tuple<T, T, T> pixel = inputPixels.getPixel(i);
-    if (pixelMap.find(pixel) == pixelMap.end()) {
+    std::tuple<T, T, T> const pixel = inputPixels.getPixel(i);
+    if (!pixelMap.contains(pixel)) {
       // Assign a new index to this color
       auto index = static_cast<uint32_t>(pixelMap.size());
       pixelMap[pixel] = index;
@@ -44,7 +44,7 @@ void writeCompressedData(const ImageSOA<T> &inputPixels, std::map<std::tuple<T,T
   constexpr int limitvalue2 = 65535;
   for (std::size_t i = 0; i < inputPixels.size(); i++) {
     auto iter = pixelMap.find(inputPixels.getPixel(i));
-    uint32_t index = iter->second;
+    uint32_t const index = iter->second;
     if (pixelMap.size() <= limitvalue) {
       auto index8 = static_cast<uint8_t>(index);
       SOAToBinary_(outputFile, index8);

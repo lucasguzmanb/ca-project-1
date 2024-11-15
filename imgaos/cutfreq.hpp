@@ -5,12 +5,10 @@
 
 #include <algorithm>
 #include <bits/ranges_algo.h>
-#include <chrono>
 #include <cmath>
 #include <iostream>
 #include <limits>
 #include <map>
-#include <queue>
 #include <tuple>
 #include <vector>
 
@@ -24,8 +22,8 @@ class KDTree {
     }
 
     // Find the nearest neighbor to a given pixel in the KD-Tree
-    Pixel<T> nearestNeighbor(Pixel<T> const & target) const {
-      Pixel<T> bestMatch;
+    [[nodiscard]] Pixel<T> nearestNeighbor(Pixel<T> const & target) const {
+      Pixel<T> bestMatch{};
       double bestDistance = std::numeric_limits<double>::max();
       nearestNeighborSearch({0, tree.size(), 0}, target, bestMatch, bestDistance);
       return bestMatch;
@@ -65,6 +63,7 @@ class KDTree {
       }
     }
     // Optimized nearest neighbor search
+  // NOLINTBEGIN(misc-no-recursion)
   void nearestNeighborSearch(std::vector<size_t> const &bounds, Pixel<T> const &target, Pixel<T> &bestMatch, double &bestDistance) const {
       size_t const start = bounds[0];
       size_t const end = bounds[1];
@@ -90,13 +89,13 @@ class KDTree {
         axisDist = std::abs(target.b - current.b);
       }
       // Determine traversal order
-      bool leftFirst = (axis == 0 && target.r < current.r) ||
-                       (axis == 1 && target.g < current.g) ||
-                       (axis == 2 && target.b < current.b);
-      std::vector<size_t> nearBounds = {leftFirst ? start : median + 1,
+      bool const leftFirst = (axis == 0 && target.r < current.r) ||
+                             (axis == 1 && target.g < current.g) ||
+                             (axis == 2 && target.b < current.b);
+      std::vector<size_t> const nearBounds = {leftFirst ? start : median + 1,
                                         leftFirst ? median : end,
                                         static_cast<size_t>(depth + 1)};
-      std::vector<size_t> farBounds = {leftFirst ? median + 1 : start,
+      std::vector<size_t> const farBounds = {leftFirst ? median + 1 : start,
                                        leftFirst ? end : median,
                                        static_cast<size_t>(depth + 1)};
       // Recursively search the closer subtree
@@ -107,10 +106,11 @@ class KDTree {
       }
     }
     // Calculate Euclidean distance between two pixels
-    double euclideanDistance(Pixel<T> const & pixel1, Pixel<T> const & pixel2) const {
+    [[nodiscard]] double euclideanDistance(Pixel<T> const & pixel1, Pixel<T> const & pixel2) const {
       return std::sqrt(std::pow(pixel1.r - pixel2.r, 2) + std::pow(pixel1.g - pixel2.g, 2) +
                        std::pow(pixel1.b - pixel2.b, 2));
     }
+  // NOLINTEND(misc-no-recursion)
 };
 
 template <typename T>
@@ -140,7 +140,7 @@ void removeLFCaos(std::vector<Pixel<T>> & pixels, int n) {
     }
   }
   // Step 3: Build k-d tree for remaining colors
-  KDTree<T> kdTree(remainingColors);
+  KDTree<T> const kdTree(remainingColors);
   // Step 4: Map removed pixels to their closest color using the KD-Tree
   std::map<Pixel<T>, Pixel<T>, Pixel_map<T>> replacementMap;
   for (auto const & pixel : removed_pixels) {
