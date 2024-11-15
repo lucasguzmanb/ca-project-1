@@ -1,12 +1,13 @@
 /* SOA */
 
 #include "common/binaryio.hpp"
-#include "common/progargs.hpp"
-#include "imgsoa/imagesoa.hpp"
-#include "imgsoa/resize.hpp"
 #include "common/info.hpp"
-#include "imgsoa/maxlevel.hpp"
+#include "common/progargs.hpp"
 #include "imgsoa/compress.hpp"
+#include "imgsoa/cutfreq.hpp"
+#include "imgsoa/imagesoa.hpp"
+#include "imgsoa/maxlevel.hpp"
+#include "imgsoa/resize.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -81,18 +82,16 @@ int main(int const argc, char * argv[]) { // NOLINT(readability-function-size)
   } else if (args.operation == "cutfreq") {
     if (isInputUint8) {
       outputPixels8 = inputPixels8;
-      std::cout << "cutfreq8\n";
+      removeLFCsoa(outputPixels8, args.extra[0]);
     } else {
-      std::cout << "cutfreq16\n";
       outputPixels16 = inputPixels16;
+      removeLFCsoa(outputPixels16, args.extra[0]);
     }
   } else if (args.operation == "compress") {
     newMetadata.format = "C6";
     if (isInputUint8) {
-      std::cout << "compress8\n";
       compress(inputPixels8, outputFile, newMetadata);
     } else {
-      std::cout << "compress16\n";
       compress(inputPixels16, outputFile, newMetadata);
     }
     return 0;
