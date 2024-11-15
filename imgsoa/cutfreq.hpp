@@ -139,7 +139,6 @@ void removeLFCsoa(ImageSOA<T>& pixels, int n) {
     // Handle case where n >= number of unique colors
     if (n >= static_cast<int>(frequency.size())) {
         clearToBlack(pixels);
-        std::cout << "All pixels changed to black as n >= unique colors.\n";
         return;
     }
     std::vector<std::pair<int, int>> frequencyVector = sortFrequency(frequency);
