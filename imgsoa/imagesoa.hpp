@@ -51,7 +51,15 @@ struct Pixel_map {
 template <typename T>
 ImageSOA<T> binaryToSOA(std::ifstream & inputFile, int const width, int const height);
 
+
 template <typename T>
 void SOAToBinary(std::ofstream & outputFile, ImageSOA<T> const & data);
+
+template <typename T>
+void SOAToBinary_(std::ofstream & outputFile, T const & data) {
+  // Write the single instance of T in binary to the output file
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+  outputFile.write(reinterpret_cast<char const *>(&data), sizeof(T));
+}
 
 #endif  // IMAGESOA_HPP
