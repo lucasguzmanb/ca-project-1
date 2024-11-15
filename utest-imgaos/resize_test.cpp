@@ -52,7 +52,7 @@ TEST(utest_imgaos, ResizeAndCompare) {
 
   for (auto const & testCase : testCases) {
     std::ifstream inputFile = openInputFile(testCase.inputFile);
-    Metadata inputMetadata  = obtainMetadata(inputFile);
+    Metadata const inputMetadata  = obtainMetadata(inputFile);
     Metadata outputMetadata = inputMetadata;
     outputMetadata.height   = testCase.newHeight;
     outputMetadata.width    = testCase.newWidth;
