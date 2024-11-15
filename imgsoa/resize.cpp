@@ -10,23 +10,20 @@ T interpolation(T color1, T color2, double frac) {
    * perform linear interpolation with frac being quotient of x - x1 and x2 - x1
    * where xi - coordinates along certain axes and yi - color values
    */
-  return static_cast<T>(color1 + ((color2 - color1) * frac));
+  return static_cast<T> (color1 + ((color2 - color1) * frac));
 }
 
 /*
- * perform scaling of the size of the picture to a certain width and height
- * use linear interpolation for this
- * return structure storing vectors of pixels colour values of new resized photo
+   * perform scaling of the size of the picture to a certain width and height
+   * use linear interpolation for this
+   * return structure storing vectors of pixels colour values of new resized photo
  */
 template <typename T>
-ImageSOA<T> resize(ImageSOA<T> pixels, Metadata & metadata, std::vector<int> const & size) {
-  // Define the new dimensions
-  int const newWidth  = size[0];
+ImageSOA<T> resize(ImageSOA<T> pixels, Metadata metadata, std::vector<int> const & size){
+  int const newWidth = size[0];  // Define the new dimensions
   int const newHeight = size[1];
   ImageSOA<T> newPixels;
-  newPixels.r.resize(static_cast<std::size_t>(newWidth) * newHeight);
-  newPixels.g.resize(static_cast<std::size_t>(newWidth) * newHeight);
-  newPixels.b.resize(static_cast<std::size_t>(newWidth) * newHeight);
+  newPixels.resize(static_cast<size_t>(newWidth) * static_cast<size_t>(newHeight));
   T color1;
   T color2;
   for (int i = 0; i < newHeight; i++) {
@@ -39,56 +36,57 @@ ImageSOA<T> resize(ImageSOA<T> pixels, Metadata & metadata, std::vector<int> con
       double const y_diff = (i * static_cast<double>(metadata.height) / newHeight) - y_l;
       // compute new red value
       color1 = interpolation<T>(
-          pixels
-              .r[(static_cast<std::size_t>(y_l) * static_cast<std::size_t>(metadata.width)) + x_l],
-          pixels
-              .r[(static_cast<std::size_t>(y_l) * static_cast<std::size_t>(metadata.width)) + x_h],
+          pixels.r[(static_cast<size_t>(y_l) * static_cast<size_t>(metadata.width)) +
+                   static_cast<size_t>(x_l)],
+          pixels.r[(static_cast<size_t>(y_l) * static_cast<size_t>(metadata.width)) +
+                   static_cast<size_t>(x_h)],
           x_diff);
       color2 = interpolation<T>(
-          pixels
-              .r[(static_cast<std::size_t>(y_h) * static_cast<std::size_t>(metadata.width)) + x_l],
-          pixels
-              .r[(static_cast<std::size_t>(y_h) * static_cast<std::size_t>(metadata.width)) + x_h],
+          pixels.r[(static_cast<size_t>(y_h) * static_cast<size_t>(metadata.width)) +
+                   static_cast<size_t>(x_l)],
+          pixels.r[(static_cast<size_t>(y_h) * static_cast<size_t>(metadata.width)) +
+                   static_cast<size_t>(x_h)],
           x_diff);
-      newPixels.r[(static_cast<std::size_t>(i) * static_cast<std::size_t>(newWidth)) + j] =
-          interpolation<T>(color1, color2, y_diff);
+      newPixels.r[(static_cast<size_t>(i) * static_cast<size_t>(newWidth)) + static_cast<size_t>(j)]
+          = interpolation<T>(color1, color2, y_diff);
       // compute new green value
       color1 = interpolation<T>(
-          pixels
-              .g[(static_cast<std::size_t>(y_l) * static_cast<std::size_t>(metadata.width)) + x_l],
-          pixels
-              .g[(static_cast<std::size_t>(y_l) * static_cast<std::size_t>(metadata.width)) + x_h],
+          pixels.g[(static_cast<size_t>(y_l) * static_cast<size_t>(metadata.width)) +
+                   static_cast<size_t>(x_l)],
+          pixels.g[(static_cast<size_t>(y_l) * static_cast<size_t>(metadata.width)) +
+                   static_cast<size_t>(x_h)],
           x_diff);
       color2 = interpolation<T>(
-          pixels
-              .g[(static_cast<std::size_t>(y_h) * static_cast<std::size_t>(metadata.width)) + x_l],
-          pixels
-              .g[(static_cast<std::size_t>(y_h) * static_cast<std::size_t>(metadata.width)) + x_h],
+          pixels.g[(static_cast<size_t>(y_h) * static_cast<size_t>(metadata.width)) +
+                   static_cast<size_t>(x_l)],
+          pixels.g[(static_cast<size_t>(y_h) * static_cast<size_t>(metadata.width)) +
+                   static_cast<size_t>(x_h)],
           x_diff);
-      newPixels.g[(static_cast<std::size_t>(i) * static_cast<std::size_t>(newWidth)) + j] =
-          interpolation<T>(color1, color2, y_diff);
+      newPixels.g[(static_cast<size_t>(i) * static_cast<size_t>(newWidth)) + static_cast<size_t>(j)]
+          = interpolation<T>(color1, color2, y_diff);
       // compute new blue value
       color1 = interpolation<T>(
-          pixels
-              .b[(static_cast<std::size_t>(y_l) * static_cast<std::size_t>(metadata.width)) + x_l],
-          pixels
-              .b[(static_cast<std::size_t>(y_l) * static_cast<std::size_t>(metadata.width)) + x_h],
+          pixels.b[(static_cast<size_t>(y_l) * static_cast<size_t>(metadata.width)) +
+                   static_cast<size_t>(x_l)],
+          pixels.b[(static_cast<size_t>(y_l) * static_cast<size_t>(metadata.width)) +
+                   static_cast<size_t>(x_h)],
           x_diff);
       color2 = interpolation<T>(
-          pixels
-              .b[(static_cast<std::size_t>(y_h) * static_cast<std::size_t>(metadata.width)) + x_l],
-          pixels
-              .b[(static_cast<std::size_t>(y_h) * static_cast<std::size_t>(metadata.width)) + x_h],
+          pixels.b[(static_cast<size_t>(y_h) * static_cast<size_t>(metadata.width)) +
+                   static_cast<size_t>(x_l)],
+          pixels.b[(static_cast<size_t>(y_h) * static_cast<size_t>(metadata.width)) +
+                   static_cast<size_t>(x_h)],
           x_diff);
-      newPixels.b[(static_cast<std::size_t>(i) * static_cast<std::size_t>(newWidth)) + j] =
-          interpolation<T>(color1, color2, y_diff);
+      newPixels.b[(static_cast<size_t>(i) * static_cast<size_t>(newWidth)) + static_cast<size_t>(j)]
+          = interpolation<T>(color1, color2, y_diff);
     }
   }
   return newPixels;
 }
 
+
 // explicitly instantiate the required template specializations
-template ImageSOA<uint8_t> resize(ImageSOA<uint8_t> pixels, Metadata & metadata,
+template ImageSOA<uint8_t> resize(ImageSOA<uint8_t> pixels, Metadata metadata,
                                   std::vector<int> const & size);
-template ImageSOA<uint16_t> resize(ImageSOA<uint16_t> pixels, Metadata & metadata,
+template ImageSOA<uint16_t> resize(ImageSOA<uint16_t> pixels, Metadata metadata,
                                    std::vector<int> const & size);

@@ -1,24 +1,19 @@
 #include "resize.hpp"
 
-#include "common/binaryio.hpp"
-#include "imageaos.hpp"
-
-#include <vector>
-
 // Function for pixel interpolation
 /*
- * perform linear interpolation and return its result
- * Linear interpolation formula:
- *      y = y1 + (x - x1) * (y2 - y1) / (x2 - x1),
- * perform linear interpolation with frac being quotient of x - x1 and x2 - x1
- * where xi - coordinates along certain axes and yi - color values
+   * perform linear interpolation and return its result
+   * Linear interpolation formula:
+   *      y = y1 + (x - x1) * (y2 - y1) / (x2 - x1),
+   * perform linear interpolation with frac being quotient of x - x1 and x2 - x1
+   * where xi - coordinates along certain axes and yi - color values
  */
 template <typename T>
-Pixel<T> interpolation(Pixel<T> color1, Pixel<T> color2, double frac) {
-  Pixel<T> result{};
-  result.r = static_cast<T>(color1.r + ((color2.r - color1.r) * frac));
-  result.g = static_cast<T>(color1.g + ((color2.g - color1.g) * frac));
-  result.b = static_cast<T>(color1.b + ((color2.b - color1.b) * frac));
+Pixel<T> interpolation(Pixel<T> c1, Pixel<T> c2, double frac) {
+  Pixel<T> result;
+  result.r = static_cast<T>(c1.r + ((c2.r - c1.r) * frac));
+  result.g = static_cast<T>(c1.g + ((c2.g - c1.g) * frac));
+  result.b = static_cast<T>(c1.b + ((c2.b - c1.b) * frac));
   return result;
 }
 
@@ -33,16 +28,23 @@ Pixel<T> interpolation(Pixel<T> color1, Pixel<T> color2, double frac) {
  * compute coordinates of corresponding pixels at old photo to a (i, j) pixel in new one
  */
 template <typename T>
-std::vector<Pixel<T>> resize(std::vector<Pixel<T>> pixels, Metadata & metadata,
-                             std::vector<int> const & size) {
-  int const newWidth  = size[0];
-  int const newHeight = size[1];
-  std::vector<Pixel<T>> newPixels(static_cast<size_t>(newWidth * newHeight));
+std::vector<Pixel<T> > resize(std::vector<Pixel<T> > pixels, Metadata metadata,
+                             std::vector<int> const & size){
 
+  int newWidth = size[0], newHeight = size[1];
+  std::vector<Pixel<T> > newPixels(static_cast<size_t>(newWidth * newHeight));
+  //std::vector<Pixel<T> > newPixels(static_cast<size_t>(newWidth * newHeight * 3));
+  //std::vector<Pixel<T> > newPixels(static_cast<uint32_t>(newWidth * newHeight) * sizeof(Pixel<T>) * 3);
+  //std::vector<Pixel<T> > newPixels(pixels.size());
   Pixel<T> color1{};
   Pixel<T> color2{};
   for (int i = 0; i < newHeight; i++) {
     for (int j = 0; j < newWidth; j++) {
+      // linear interpolation:
+      // y = y1 + (x - x1) * (y2 - y1) / (x2 - x1),
+      // where xi is a coordinates and yi is the colour at that point
+      //
+      // compute coordinates of corresponding pixels at old photo to a (i, j) pixel in new one
       int const x_l = j * metadata.width / newWidth;
       int const y_l = i * metadata.height / newHeight;
       int const x_h = std::min(x_l + 1, metadata.width - 1);   // To avoid out-of-bounds access
@@ -54,30 +56,35 @@ std::vector<Pixel<T>> resize(std::vector<Pixel<T>> pixels, Metadata & metadata,
       double const x_diff = (j * static_cast<double>(metadata.width) / newWidth) - x_l;
       double const y_diff = (i * static_cast<double>(metadata.height) / newHeight) - y_l;
 
+      // Perform interpolation
       // interpolate between (x_l, y_l) and (x_h, y_l)
       color1 = interpolation<T>(
-          pixels[(static_cast<std::size_t>(y_l) * static_cast<std::size_t>(metadata.width)) +
-                 static_cast<std::size_t>(x_l)],
-          pixels[(static_cast<std::size_t>(y_l) * static_cast<std::size_t>(metadata.width)) +
-                 static_cast<std::size_t>(x_h)],
+          pixels[(static_cast<size_t>(y_l) * static_cast<size_t>(metadata.width)) +
+                 static_cast<size_t>(x_l)],
+          pixels[(static_cast<size_t>(y_l) * static_cast<size_t>(metadata.width)) +
+                 static_cast<size_t>(x_h)],
           x_diff);
       // interpolate between (x_l, y_l) and (x_h, y_l)
       color2 = interpolation<T>(
-          pixels[(static_cast<std::size_t>(y_h) * static_cast<std::size_t>(metadata.width)) +
-                 static_cast<std::size_t>(x_l)],
-          pixels[(static_cast<std::size_t>(y_h) * static_cast<std::size_t>(metadata.width)) +
-                 static_cast<std::size_t>(x_h)],
+          pixels[(static_cast<size_t>(y_h) * static_cast<size_t>(metadata.width)) +
+                 static_cast<size_t>(x_l)],
+          pixels[(static_cast<size_t>(y_h) * static_cast<size_t>(metadata.width)) +
+                 static_cast<size_t>(x_h)],
           x_diff);
       // interpolation along the y-axis
-      newPixels[(static_cast<std::size_t>(i) * static_cast<std::size_t>(newWidth)) +
-                static_cast<std::size_t>(j)] = interpolation<T>(color1, color2, y_diff);
+      newPixels[(static_cast<size_t>(i) * static_cast<size_t>(newWidth)) +
+                static_cast<size_t>(j)] = interpolation<T>(color1, color2, y_diff);
     }
   }
   return newPixels;
 }
 
 // explicitly instantiate the required template specializations
-template std::vector<Pixel<uint8_t>> resize(std::vector<Pixel<uint8_t>> pixels, Metadata & metadata,
-                                            std::vector<int> const & size);
-template std::vector<Pixel<uint16_t>> resize(std::vector<Pixel<uint16_t>> pixels,
-                                             Metadata & metadata, std::vector<int> const & size);
+template std::vector<Pixel<uint8_t>> resize<uint8_t>(
+    std::vector<Pixel<uint8_t>> pixels,
+    Metadata metadata,
+    std::vector<int> const & size);
+template std::vector<Pixel<uint16_t>> resize<uint16_t>(
+    std::vector<Pixel<uint16_t>> pixels,
+    Metadata metadata,
+    std::vector<int> const & size);
