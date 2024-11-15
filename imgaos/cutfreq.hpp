@@ -10,10 +10,70 @@
 #include <limits>
 #include <map>
 #include <tuple>
-#include <unordered_map>
+#include <stack>
 #include <vector>
+template<typename T>
+double euclideanDistance(Pixel<T> const & pixel1, Pixel<T> const & pixel2) {
+  return std::sqrt(std::pow(pixel1.r - pixel2.r, 2) + std::pow(pixel1.g - pixel2.g, 2) +
+                   std::pow(pixel1.b - pixel2.b, 2));
+}
 
-// Assume Pixel<T> and Pixel_map<T> are already defined, as in the original code.
+template <typename T>
+void updateBestMatch(Pixel<T> const & currentPixel, Pixel<T> const & target, Pixel<T> & bestMatch,
+                     double & bestDistance) {
+  double const dist = euclideanDistance(currentPixel, target);
+  if (dist < bestDistance) {
+    bestDistance = dist;
+    bestMatch    = currentPixel;
+  }
+}
+
+template <typename T>
+inline double computeAxisDistance(Pixel<T> const &currentPixel, Pixel<T> const &target, int axis) {
+  switch (axis) {
+    case 0: return std::abs(target.r - currentPixel.r);
+    case 1: return std::abs(target.g - currentPixel.g);
+    case 2:
+      return std::abs(target.b - currentPixel.b);
+    default:
+      break;
+  }
+  return NAN;
+}
+
+template <typename T>
+std::tuple<size_t, size_t, size_t, size_t> determineTraversalOrder(
+    std::vector<size_t> const &bounds, Pixel<T> const &currentPixel,
+    Pixel<T> const &target, int const axis) {
+
+  size_t const start = bounds[0];
+  size_t const end = bounds[1];
+  size_t const median = bounds[2];
+
+  bool const leftFirst = (axis == 0 && target.r < currentPixel.r) ||
+                         (axis == 1 && target.g < currentPixel.g) ||
+                         (axis == 2 && target.b < currentPixel.b);
+
+  size_t nearStart = 0;
+  size_t nearEnd = 0;
+  size_t farStart = 0;
+  size_t farEnd = 0;
+
+  if (leftFirst) {
+    nearStart = start;
+    nearEnd = median;
+    farStart = median + 1;
+    farEnd = end;
+  } else {
+    nearStart = median + 1;
+    nearEnd = end;
+    farStart = start;
+    farEnd = median;
+  }
+
+  return {nearStart, nearEnd, farStart, farEnd};
+}
+
 
 template <typename T>
 class KDTree {
@@ -63,54 +123,43 @@ class KDTree {
         stack.emplace_back(median + 1, currentEnd, currentDepth + 1);
       }
     }
-  // NOLINTBEGIN(misc-no-recursion)
     // Optimized nearest neighbor search
-  void nearestNeighborSearch(size_t const start, size_t const end, int const depth,
-                         Pixel<T> const &target, Pixel<T> &bestMatch,
-                         double &bestDistance) const {
-      if (start >= end) {
-        return;
-      }
-      size_t const median = (start + end) / 2;
-      Pixel<T> const &current = tree[median];
-      // Compute distance and update the best match if necessary
-      double const dist = euclideanDistance(current, target);
-      if (dist < bestDistance) {
-        bestDistance = dist;
-        bestMatch = current;
-      }
-      // Determine the splitting axis and calculate the axis distance
-      int const axis = depth % 3;
-      double axisDist = NAN;
-      if (axis == 0) {
-        axisDist = std::abs(target.r - current.r);
-      } else if (axis == 1) {
-        axisDist = std::abs(target.g - current.g);
-      } else {
-        axisDist = std::abs(target.b - current.b);
-      }
-      // Determine traversal order
-      bool leftFirst = (axis == 0 && target.r < current.r) ||
-                       (axis == 1 && target.g < current.g) ||
-                       (axis == 2 && target.b < current.b);
-      size_t const nearStart = leftFirst ? start : median + 1;
-      size_t const nearEnd = leftFirst ? median : end;
-      size_t const farStart = leftFirst ? median + 1 : start;
-      size_t const farEnd = leftFirst ? end : median;
-      // Recursively search the closer subtree
-      nearestNeighborSearch(nearStart, nearEnd, depth + 1, target, bestMatch, bestDistance);
-      // Only search the farther subtree if there's a possibility of a closer match
-      if (axisDist < bestDistance) {
-        nearestNeighborSearch(farStart, farEnd, depth + 1, target, bestMatch, bestDistance);
-      }
-    }
-  // NOLINTEND(misc-no-recursion)
+  void nearestNeighborSearch(std::vector<size_t> const &bounds, Pixel<T> const &target,
+                           Pixel<T> &bestMatch, double &bestDistance) const {
+      struct StackEntry {
+        std::vector<size_t> bounds;
+        int depth{};
+      };
 
-    // Calculate Euclidean distance between two pixels
-    double euclideanDistance(Pixel<T> const & pixel1, Pixel<T> const & pixel2) const {
-      return std::sqrt(std::pow(pixel1.r - pixel2.r, 2) + std::pow(pixel1.g - pixel2.g, 2) +
-                       std::pow(pixel1.b - pixel2.b, 2));
+      std::stack<StackEntry> stack;
+      stack.push({bounds, 0});
+
+      while (!stack.empty()) {
+        StackEntry current = stack.top();
+        stack.pop();
+
+        size_t const start = current.bounds[0];
+        size_t const end = current.bounds[1];
+        size_t median = current.bounds[2];
+
+        if (start >= end) { continue;
+}
+
+        Pixel<T> const &currentPixel = tree[median];
+        updateBestMatch(currentPixel, target, bestMatch, bestDistance);
+
+        int const axis = current.depth % 3;
+        double const axisDist = computeAxisDistance(currentPixel, target, axis);
+
+        auto [nearStart, nearEnd, farStart, farEnd] = determineTraversalOrder(current.bounds, currentPixel, target, axis);
+
+        if (axisDist < bestDistance) {
+          stack.push({{farStart, farEnd, median}, current.depth + 1});
+}
+        stack.push({{nearStart, nearEnd, median}, current.depth + 1});
+      }
     }
+
 };
 
 template <typename T>

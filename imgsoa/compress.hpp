@@ -2,84 +2,59 @@
 #define COMPRESS_HPP
 
 
+#include "common/binaryio.hpp"
 #include "imagesoa.hpp"
 #include <map>
 
-
-//void writetable(std::map<std::truple<iunt16_t, uint16_t, uint16_t>&colorMap);
-
-//std::map<std::truple<iunt16_t, uint16_t, uint16_t> getcolors(%inputImage);
-//void writepixels(inputImage, std::map<std::truple<iunt16_t, uint16_t, uint16_t>&colorMap);
-
-
-
 template <typename T>
-std::vector<Pixel<T>> compress(const std::vector<imageSOA<T>> imageSOA, Metadata metadata) {
-    //initialize values
-    int const maxColorValue = metadata.maxColorValue;
-    std:: map<Pixel<T>, T> pixelMap = getColors(imageSOA);
-    std::vector<Pixel<T>> outputPixels = writeCompressedData(pixelMap, maxColorValue);
-    return outputPixels;
-
+void compress(const ImageSOA<T> &inputPixels, std::ofstream &outputFile, Metadata const &metadata) {
+  std::map<std::tuple<T,T,T>, uint32_t> pixelMap = getColors(inputPixels);
+  writeCompressedData(inputPixels, pixelMap, outputFile, metadata);
 }
 
-
 template <typename T>
-std::map<Pixel<T>, T> getColors(const std::vector<Pixel<T>>& inputPixels) {
-  std::map<Pixel<T>, T> pixelMap;
-  for (const auto& pixel : inputPixels) {
-    // Check if the color is in the map
+std::map<std::tuple<T,T,T>, uint32_t> getColors(const ImageSOA<T> &inputPixels) {
+  std::map<std::tuple<T,T,T>, uint32_t> pixelMap;
+  for (std::size_t i = 0; i < inputPixels.size(); i++) {
+    std::tuple<T, T, T> pixel = inputPixels.getPixel(i);
     if (pixelMap.find(pixel) == pixelMap.end()) {
       // Assign a new index to this color
-      T index = static_cast<T>(pixelMap.size());
+      auto index = static_cast<uint32_t>(pixelMap.size());
       pixelMap[pixel] = index;
     }
   }
-  return pixelMap; // Return the pixel map
+  return pixelMap;
 }
 
 
-
 template <typename T>
-std::vector<Pixel<T>> writeCompressedData(std::map<Pixel<T>, T> &pixelMap, int maxColorValue){
+void writeCompressedData(const ImageSOA<T> &inputPixels, std::map<std::tuple<T,T,T>, uint32_t>&pixelMap, std::ofstream &outputFile, Metadata const &metadata) {
+  // Write pixel data to outputFile
+  const auto numcolors = pixelMap.size();
+  writeMetadataCPPM(outputFile, metadata, static_cast<int>(numcolors));
+  for (const auto& [pixel, index] : pixelMap) {
+    const auto red= static_cast<T>(get<0>(pixel));
+    const auto green= static_cast<T>(get<1>(pixel));
+    const auto blue= static_cast<T>(get<2>(pixel));
+    SOAToBinary_(outputFile, red);
+    SOAToBinary_(outputFile, green);
+    SOAToBinary_(outputFile, blue);
+  }
   constexpr int limitvalue = 255;
   constexpr int limitvalue2 = 65535;
-  std::vector<Pixel<T>> outputPixels;
-  // Write pixel data to outputPixels vector
-  for (const auto& [pixel, index] : pixelMap) {
-    // Store the pixel in the vector
-    if (maxColorValue <= limitvalue) {
-      // For 8-bit color depth
-      uint8_t r = static_cast<uint8_t>(pixel.r);
-      uint8_t g = static_cast<uint8_t>(pixel.g);
-      uint8_t b = static_cast<uint8_t>(pixel.b);
-      outputPixels.push_back(Pixel<T>{r, g, b}); // Add the pixel to the vector
-    } else {
-      // For higher color depths
-      outputPixels.push_back(pixel); // Add the pixel to the vector directly
-    }
-  }
-  // Write indices for the pixel data
-  for (const auto& [pixel, index] : pixelMap) {
+  for (std::size_t i = 0; i < inputPixels.size(); i++) {
+    auto iter = pixelMap.find(inputPixels.getPixel(i));
+    uint32_t index = iter->second;
     if (pixelMap.size() <= limitvalue) {
-      uint8_t index8 = static_cast<uint8_t>(index);
-      outputPixels.push_back(Pixel<T>{index8, 0, 0}); // Store index as a pixel (dummy values for g and b)
+      auto index8 = static_cast<uint8_t>(index);
+      SOAToBinary_(outputFile, index8);
     } else if (pixelMap.size() <= limitvalue2) {
-      uint8_t index8_high = static_cast<uint8_t>((index >> 8) & 0xFF);  // higher 8 bits
-      uint8_t index8_low = static_cast<uint8_t>(index & 0xFF);          // lower 8 bits
-      outputPixels.push_back(Pixel<T>{index8_high, index8_low, 0}); // Store index in two 8-bit channels
+      auto index16 = static_cast<uint16_t>(index);
+      SOAToBinary_(outputFile, index16);
     } else {
-      uint8_t index8_high = static_cast<uint8_t>((index >> 16) & 0xFF); // highest 8 bits
-      uint8_t index8_mid = static_cast<uint8_t>((index >> 8) & 0xFF);   // middle 8 bits
-      uint8_t index8_low = static_cast<uint8_t>(index & 0xFF);          // lowest 8 bits
-      outputPixels.push_back(Pixel<T>{index8_high, index8_mid, index8_low}); // Store in three 8-bit channels
+      SOAToBinary_(outputFile, index);
     }
   }
-  return outputPixels; // Return the vector of output pixels
-};
-
-
-
-
+}
 
 #endif //COMPRESS_HPP

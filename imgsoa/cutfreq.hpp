@@ -50,8 +50,33 @@ inline std::vector<std::pair<int, int>> sortFrequency(std::map<int, int> const &
 }
 
 // KDTree class to handle nearest neighbor searches
-template <typename T>
+
 class KDTree {
+  public:
+    // Constructor to initialize and build the KDTree
+    explicit KDTree(std::vector<int> const &pixels) : tree(pixels) {
+      buildTree(0, tree.size(), 0);
+    }
+
+    // Function to find the nearest neighbor to a given pixel
+    [[nodiscard]] int nearestNeighbor(int pixel) const {
+      int nearest = tree[0];
+      double minDist = std::numeric_limits<double>::max();
+
+      for (auto const &candidate : tree) {
+        double const dist = std::sqrt(std::pow(extractRed(pixel) - extractRed(candidate), 2) +
+                                      std::pow(extractGreen(pixel) - extractGreen(candidate), 2) +
+                                      std::pow(extractBlue(pixel) - extractBlue(candidate), 2));
+
+        if (dist < minDist) {
+          minDist = dist;
+          nearest = candidate;
+        }
+      }
+
+      return nearest;
+    }
+
   private:
     std::vector<int> tree;  // Tree storing pixel colors as packed integers
 
@@ -63,7 +88,14 @@ class KDTree {
     [[nodiscard]] static int extractBlue(int const pixel) { return pixel & mask; }
 
     // Comparator function for sorting pixels based on the current axis
-    [[nodiscard]] static bool comparator(int const pixel1, int const pixel2, int const axis) {
+  [[nodiscard]] static bool comparator(std::vector<int> const &pixels, int const axis) {
+      if (pixels.size() != 2) {
+        throw std::invalid_argument("The vector must contain exactly two elements.");
+      }
+
+      int const pixel1 = pixels[0];
+      int const pixel2 = pixels[1];
+
       switch (axis) {
         case 0:
           return extractRed(pixel1) < extractRed(pixel2);
@@ -77,6 +109,7 @@ class KDTree {
       return false;
     }
 
+    //NOLINTBEGIN(misc-no-recursion)
     // Recursive function to build the KDTree
     void buildTree(size_t const currentStart, size_t const currentEnd, int const axis) {
       if (currentStart >= currentEnd) { return; }
@@ -89,38 +122,14 @@ class KDTree {
                        tree.begin() + static_cast<DifferenceType>(median),
                        tree.begin() + static_cast<DifferenceType>(currentEnd),
                        [&](int const pixel1, int const pixel2) {
-                         return comparator(pixel1, pixel2, axis);
+                        return comparator({pixel1, pixel2}, axis);
                        });
 
       buildTree(currentStart, median, (axis + 1) % 3);
       buildTree(median + 1, currentEnd, (axis + 1) % 3);
     }
-
-  public:
-    // Constructor to initialize and build the KDTree
-    explicit KDTree(std::vector<int> const & pixels) : tree(pixels) {
-      buildTree(0, tree.size(), 0);
-    }
-
-    // Function to find the nearest neighbor to a given pixel
-    [[nodiscard]] int nearestNeighbor(int pixel) const {
-      int nearest    = tree[0];
-      double minDist = std::numeric_limits<double>::max();
-
-      for (auto const & candidate : tree) {
-        double const dist = std::sqrt(std::pow(extractRed(pixel) - extractRed(candidate), 2) +
-                                      std::pow(extractGreen(pixel) - extractGreen(candidate), 2) +
-                                      std::pow(extractBlue(pixel) - extractBlue(candidate), 2));
-
-        if (dist < minDist) {
-          minDist = dist;
-          nearest = candidate;
-        }
-      }
-
-      return nearest;
-    }
 };
+    //NOLINTEND(misc-no-recursion)
 
 // Function to remove the n the least frequent colors (LFC) and replace them with the nearest
 // neighbor from the KDTree
@@ -147,7 +156,7 @@ void removeLFCsoa(ImageSOA<T> & pixels, int n) {
       remainingColors.push_back(frequencyVector[i].first);
     }
   }
-  KDTree<int> const kdTree(remainingColors);
+  KDTree const kdTree(remainingColors);
   std::map<int, int> replacementMap;
   for (auto const & pixel : removed_pixels) {
     replacementMap[pixel] = kdTree.nearestNeighbor(pixel);
