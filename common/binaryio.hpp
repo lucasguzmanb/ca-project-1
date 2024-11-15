@@ -14,11 +14,6 @@ struct Metadata {
     int maxColorValue = 0;
 
     Metadata() = default;
-
-    // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
-    Metadata(std::string _format, int const _width, int const _height, int const _maxColorValue)
-      : format(std::move(_format)), width(_width), height(_height), maxColorValue(_maxColorValue) {
-    }
 };
 
 Metadata obtainMetadata(std::ifstream & inputFile);
