@@ -9,17 +9,11 @@
 
 struct Metadata {
     std::string format;
-    int width;
-    int height;
-    int maxColorValue;
+    int width         = 0;
+    int height        = 0;
+    int maxColorValue = 0;
 
-    // Constructor
-    Metadata(std::string _format, int const _width, int const _height, int const _maxColorValue)
-      : format(std::move(_format)), width(_width), height(_height), maxColorValue(_maxColorValue) {
-    }
-
-    // Default constructor
-    Metadata() : width(0), height(0), maxColorValue(0) { }
+    Metadata() = default;
 };
 
 Metadata obtainMetadata(std::ifstream & inputFile);
@@ -38,7 +32,7 @@ std::vector<T> readRawData(std::ifstream & inputFile, int const width, int const
    * create vector that stores the sequence of pixels of picture and return it
    */
   // Create a vector of raw data to store the binary data and read everything at once
-  auto dataSize = static_cast<std::size_t>(width * height * 3);
+  auto dataSize = static_cast<std::size_t>(width) * static_cast<std::size_t>(height) * 3;
   std::vector<T> tempData(dataSize);
 
   // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)

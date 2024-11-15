@@ -33,6 +33,7 @@ int main(int const argc, char * argv[]) {
     return 0;
   }
 
+
   constexpr int THRESHOLD = 255;
   bool const isInputUint8 = metadata.maxColorValue <= THRESHOLD;
 
@@ -47,6 +48,9 @@ int main(int const argc, char * argv[]) {
   // perform requested operation (8 or 16 bits)
   ImageSOA<uint8_t> outputPixels8;
   ImageSOA<uint16_t> outputPixels16;
+
+  /// open output file
+  std::ofstream outputFile = openOutputFile(args.output);
   if (args.operation == "maxlevel") {
     if (isInputUint8) {
       if (args.extra[0] <= THRESHOLD) {
@@ -85,22 +89,19 @@ int main(int const argc, char * argv[]) {
       outputPixels16 = inputPixels16;
     }
   } else if (args.operation == "compress") {
+    newMetadata.format = "C6";
     if (isInputUint8) {
       std::cout << "compress8\n";
-      outputPixels8 =
-          compress<uint8_t>(inputPixels8, metadata);
+      compress(inputPixels8, outputFile, newMetadata);
     } else {
       std::cout << "compress16\n";
-      outputPixels16 =
-          compress<uint8_t>(inputPixels16, metadata);
+      compress(inputPixels16, outputFile, newMetadata);
     }
+    return 0;
   } else {
     std::cerr << "Error: unknown operation\n";
     exit(EXIT_FAILURE);
   }
-
-  /// open output file
-  std::ofstream outputFile = openOutputFile(args.output);
 
   // write metadata
   writeMetadata(outputFile, newMetadata);

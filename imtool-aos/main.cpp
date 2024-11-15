@@ -3,11 +3,11 @@
 #include "common/binaryio.hpp"
 #include "common/info.hpp"
 #include "common/progargs.hpp"
+#include "imgaos/compress.hpp"
 #include "imgaos/cutfreq.hpp"
 #include "imgaos/imageaos.hpp"
 #include "imgaos/maxlevel.hpp"
 #include "imgaos/resize.hpp"
-#include "imgaos/compress.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -69,13 +69,13 @@ int main(int const argc, char * argv[]) {
     }
     newMetadata.maxColorValue = args.extra[0];
   } else if (args.operation == "resize") {
-    if (isInputUint8) {
-      outputPixels8 = resize<uint8_t>(inputPixels8, metadata, args.extra);
-    } else {
-      outputPixels16 = resize<uint16_t>(inputPixels16, metadata, args.extra);
-    }
     newMetadata.width  = args.extra[0];
     newMetadata.height = args.extra[1];
+    if (isInputUint8) {
+      outputPixels8 = resize<uint8_t>(inputPixels8, newMetadata, args.extra);
+    } else {
+      outputPixels16 = resize<uint16_t>(inputPixels16, newMetadata, args.extra);
+    }
   } else if (args.operation == "cutfreq") {
     if (isInputUint8) {
       outputPixels8 = inputPixels8;
@@ -86,7 +86,7 @@ int main(int const argc, char * argv[]) {
     }
   } else if (args.operation == "compress") {
     newMetadata.format = "C6";
-    //writeMetadata(outputFile, newMetadata);
+    // writeMetadata(outputFile, newMetadata);
     if (isInputUint8) {
       std::cout << "compress8\n";
       compress(inputPixels8, outputFile, newMetadata);

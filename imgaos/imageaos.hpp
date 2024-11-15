@@ -32,15 +32,15 @@ struct Pixel_map {
       return std::hash<T>{}(color.r) ^ std::hash<T>{}(color.g) ^ std::hash<T>{}(color.b);
     }
 
-    bool operator()(Pixel<T> const & a, Pixel<T> const & b) const {
-      if (a.r != b.r) { return a.r < b.r; }
-      if (a.g != b.g) { return a.g < b.g; }
-      return a.b < b.b;
+    bool operator()(Pixel<T> const & pixel1, Pixel<T> const & pixel2) const {
+      if (pixel1.r != pixel2.r) { return pixel1.r < pixel2.r; }
+      if (pixel1.g != pixel2.g) { return pixel1.g < pixel2.g; }
+      return pixel1.b < pixel2.b;
     }
 };
 
 template <typename T>
-std::vector<Pixel<T>> binaryToAOS(std::ifstream & inputFile, int const width, int const height);
+std::vector<Pixel<T>> binaryToAOS(std::ifstream & inputFile, int width, int height);
 
 template <typename T>
 void AOSToBinary(std::ofstream & outputFile, std::vector<Pixel<T>> const & data);

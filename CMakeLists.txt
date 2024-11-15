@@ -54,6 +54,8 @@ if (IMG_BUILD_TESTS)
     add_subdirectory(utest-imgaos)
     add_subdirectory(utest-imgsoa)
     add_subdirectory(utest-common)
+    add_subdirectory(ftest-aos)
+    add_subdirectory(ftest-soa)
 endif ()
 
 # Add executable
