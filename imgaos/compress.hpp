@@ -47,7 +47,7 @@ void writeCompressedData(const std::vector<Pixel<T>>& inputPixels, std::map<Pixe
   constexpr int limitvalue2 = 65535;
   for (std::size_t i = 0; i < inputPixels.size(); i++) {
     auto iter = pixelMap.find(inputPixels[i]);
-    uint32_t index = iter->second;
+    uint32_t const index = iter->second;
     if (pixelMap.size() <= limitvalue) {
       auto index8 = static_cast<uint8_t>(index);
       AOSToBinary_(outputFile, index8);
