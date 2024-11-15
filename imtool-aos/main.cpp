@@ -20,23 +20,16 @@ int main(int const argc, char * argv[]) {
   std::span const args_view(argv + 1, static_cast<std::size_t>(argc - 1));
   std::vector<std::string> const args_vector = {args_view.begin(), args_view.end()};
   Arguments const args                       = checkAndParseArgs(args_vector);
-
-  // open input file
-  std::ifstream inputFile = openInputFile(args.input);
-
-  Metadata const metadata = obtainMetadata(inputFile);
-  Metadata newMetadata    = metadata;
+  std::ifstream inputFile                    = openInputFile(args.input);
+  Metadata const metadata                    = obtainMetadata(inputFile);
+  Metadata newMetadata                       = metadata;
   checkFileFormat(metadata.format);
-
   if (args.operation == "info") {
     info(args, metadata);
     return 0;
   }
-
   constexpr int THRESHOLD = 255;
   bool const isInputUint8 = metadata.maxColorValue <= THRESHOLD;
-
-  // read binary data -> store using AOS (8 or 16 bits)
   std::vector<Pixel<uint8_t>> inputPixels8;
   std::vector<Pixel<uint16_t>> inputPixels16;
   if (isInputUint8) {
@@ -44,10 +37,8 @@ int main(int const argc, char * argv[]) {
   } else {
     inputPixels16 = binaryToAOS<uint16_t>(inputFile, metadata.width, metadata.height);
   }
-  // perform requested operation (8 or 16 bits)
   std::vector<Pixel<uint8_t>> outputPixels8;
   std::vector<Pixel<uint16_t>> outputPixels16;
-  // open output file
   std::ofstream outputFile = openOutputFile(args.output);
   if (args.operation == "maxlevel") {
     if (isInputUint8) {
@@ -86,12 +77,9 @@ int main(int const argc, char * argv[]) {
     }
   } else if (args.operation == "compress") {
     newMetadata.format = "C6";
-    // writeMetadata(outputFile, newMetadata);
     if (isInputUint8) {
-      std::cout << "compress8\n";
       compress(inputPixels8, outputFile, newMetadata);
     } else {
-      std::cout << "compress16\n";
       compress(inputPixels16, outputFile, newMetadata);
     }
     return 0;
@@ -100,15 +88,11 @@ int main(int const argc, char * argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  // write metadata
   writeMetadata(outputFile, newMetadata);
-
-  // write binary data
   if (newMetadata.maxColorValue <= THRESHOLD) {
     AOSToBinary<uint8_t>(outputFile, outputPixels8);
   } else {
     AOSToBinary<uint16_t>(outputFile, outputPixels16);
   }
-
   return 0;
 }
