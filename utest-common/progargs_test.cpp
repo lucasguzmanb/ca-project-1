@@ -51,20 +51,24 @@ TEST(progargs_test, CheckArgs) {
               "Error: invalid number of extra arguments for resize: 1");
 
   // Test for invalid arguments of operation "maxlevel"
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
   testCase = {.input = "input", .output = "output", .operation = "maxlevel", .extra = {-5}};
   EXPECT_EXIT(check_args(testCase), ::testing::ExitedWithCode(EXIT_FAILURE),
               "Error: invalid maxlevel: -5");
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
   testCase = {.input = "input", .output = "output", .operation = "maxlevel", .extra = {65536}};
   EXPECT_EXIT(check_args(testCase), ::testing::ExitedWithCode(EXIT_FAILURE),
               "Error: invalid maxlevel: 65536");
 
   // Test for invalid arguments of operation "resize"
   testCase = {
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
     .input = "input", .output = "output", .operation = "resize", .extra = {-10, 10}
   };
   EXPECT_EXIT(check_args(testCase), ::testing::ExitedWithCode(EXIT_FAILURE),
               "Error: invalid resize width: -10");
   testCase = {
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers,readability-magic-numbers)
     .input = "input", .output = "output", .operation = "resize", .extra = {10, -10}
   };
   EXPECT_EXIT(check_args(testCase), ::testing::ExitedWithCode(EXIT_FAILURE),

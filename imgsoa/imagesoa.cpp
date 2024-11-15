@@ -42,7 +42,7 @@ void SOAToBinary(std::ofstream & outputFile, ImageSOA<T> const & data) {
 }
 
 // explicitly tell the compiler to create template specialization of functions for different cases
-template ImageSOA<uint8_t> binaryToSOA(std::ifstream & inputFile, int const width, int const height);
-template ImageSOA<uint16_t> binaryToSOA(std::ifstream & inputFile, int const width, int const height);
+template ImageSOA<uint8_t> binaryToSOA(std::ifstream & inputFile, int width, int height);
+template ImageSOA<uint16_t> binaryToSOA(std::ifstream & inputFile, int width, int height);
 template void SOAToBinary(std::ofstream & outputFile, ImageSOA<uint8_t> const & data);
 template void SOAToBinary(std::ofstream & outputFile, ImageSOA<uint16_t> const & data);

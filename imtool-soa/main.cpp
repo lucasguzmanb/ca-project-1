@@ -1,9 +1,9 @@
 /* SOA */
 
-#include "../common/binaryio.hpp"
-#include "../common/progargs.hpp"
-#include "../imgsoa/imagesoa.hpp"
-#include "../imgsoa/resize.hpp"
+#include "common/binaryio.hpp"
+#include "common/progargs.hpp"
+#include "imgsoa/imagesoa.hpp"
+#include "imgsoa/resize.hpp"
 #include "common/info.hpp"
 #include "imgsoa/maxlevel.hpp"
 #include "imgsoa/compress.hpp"
@@ -11,7 +11,6 @@
 #include <fstream>
 #include <iostream>
 #include <span>
-#include <variant>
 #include <vector>
 
 int main(int const argc, char * argv[]) {
@@ -32,7 +31,6 @@ int main(int const argc, char * argv[]) {
     info(args, metadata);
     return 0;
   }
-
 
   constexpr int THRESHOLD = 255;
   bool const isInputUint8 = metadata.maxColorValue <= THRESHOLD;
