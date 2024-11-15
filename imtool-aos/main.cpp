@@ -60,13 +60,14 @@ int main(int const argc, char * argv[]) { // NOLINT(readability-function-size)
     }
     newMetadata.maxColorValue = args.extra[0];
   } else if (args.operation == "resize") {
-    newMetadata.width  = args.extra[0];
-    newMetadata.height = args.extra[1];
+
     if (isInputUint8) {
       outputPixels8 = resize<uint8_t>(inputPixels8, newMetadata, args.extra);
     } else {
       outputPixels16 = resize<uint16_t>(inputPixels16, newMetadata, args.extra);
     }
+    newMetadata.width  = args.extra[0];
+    newMetadata.height = args.extra[1];
   } else if (args.operation == "cutfreq") {
     if (isInputUint8) {
       outputPixels8 = inputPixels8;
