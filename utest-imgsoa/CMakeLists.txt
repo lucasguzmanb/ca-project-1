@@ -3,7 +3,6 @@
 add_executable(utest-imgsoa
         resize_test.cpp
         maxlevel_test.cpp
-        ../utest-imgaos/compress_test.cpp
         map_test.cpp)
 # Library dependencies
 target_link_libraries (utest-imgsoa
