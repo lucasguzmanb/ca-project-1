@@ -29,7 +29,7 @@ void updateBestMatch(Pixel<T> const & currentPixel, Pixel<T> const & target, Pix
 }
 
 template <typename T>
-inline double computeAxisDistance(Pixel<T> const &currentPixel, Pixel<T> const &target, int axis) {
+double computeAxisDistance(Pixel<T> const &currentPixel, Pixel<T> const &target, int const axis) {
   switch (axis) {
     case 0: return std::abs(target.r - currentPixel.r);
     case 1: return std::abs(target.g - currentPixel.g);
@@ -83,10 +83,11 @@ class KDTree {
     }
 
     // Find the nearest neighbor to a given pixel in the KD-Tree
-    Pixel<T> nearestNeighbor(Pixel<T> const & target) const {
-      Pixel<T> bestMatch;
+    [[nodiscard]] Pixel<T> nearestNeighbor(Pixel<T> const & target) const {
+      Pixel<T> bestMatch{};
       double bestDistance = std::numeric_limits<double>::max();
-      nearestNeighborSearch(0, tree.size(), 0, target, bestMatch, bestDistance);
+      std::vector<size_t> const bounds = {0, tree.size(), 0};
+      nearestNeighborSearch(bounds, target, bestMatch, bestDistance);
       return bestMatch;
     }
 
@@ -189,7 +190,7 @@ void removeLFCaos(std::vector<Pixel<T>> & pixels, int n) {
     }
   }
   // Step 3: Build k-d tree for remaining colors
-  KDTree<T> kdTree(remainingColors);
+  KDTree<T> const kdTree(remainingColors);
   // Step 4: Map removed pixels to their closest color using the KD-Tree
   std::map<Pixel<T>, Pixel<T>, Pixel_map<T>> replacementMap;
   for (auto const & pixel : removed_pixels) {
