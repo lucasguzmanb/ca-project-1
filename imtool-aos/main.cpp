@@ -14,7 +14,7 @@
 #include <span>
 #include <vector>
 
-int main(int const argc, char * argv[]) {
+int main(int const argc, char * argv[]) { // NOLINT(readability-function-size)
   // check & parse arguments
   check_minimum_args(argc);
   std::span const args_view(argv + 1, static_cast<std::size_t>(argc - 1));
@@ -85,7 +85,7 @@ int main(int const argc, char * argv[]) {
     return 0;
   } else {
     std::cerr << "Error: unknown operation\n";
-    exit(EXIT_FAILURE);
+    return -1;
   }
 
   writeMetadata(outputFile, newMetadata);
