@@ -6,27 +6,16 @@
 #include "imagesoa.hpp"
 #include <map>
 
-
-
 template <typename T>
 void compress(const ImageSOA<T> &inputPixels, std::ofstream &outputFile, Metadata const &metadata) {
-  //image_size const size_init(width, height);
-
-  //Image image(size_init, max_color);
-  //int const limit = 255;
-
   std::map<std::tuple<T,T,T>, uint32_t> pixelMap = getColors(inputPixels);
   writeCompressedData(inputPixels, pixelMap, outputFile, metadata);
-
-  //write_color_table(image, color_list, params.output_file);
-  //write_pixels(image, color_list, params.output_file);
 }
 
 template <typename T>
 std::map<std::tuple<T,T,T>, uint32_t> getColors(const ImageSOA<T> &inputPixels) {
   std::map<std::tuple<T,T,T>, uint32_t> pixelMap;
   for (std::size_t i = 0; i < inputPixels.size(); i++) {
-    //uint32_t index;
     std::tuple<T, T, T> pixel = inputPixels.getPixel(i);
     if (pixelMap.find(pixel) == pixelMap.end()) {
       // Assign a new index to this color
@@ -36,21 +25,6 @@ std::map<std::tuple<T,T,T>, uint32_t> getColors(const ImageSOA<T> &inputPixels) 
   }
   return pixelMap;
 }
-    /*for (auto [pixel, index]: pixelMap) {
-      pixelMap[pixel] = index;
-      ++index;
-    }
-  }
-  for (const auto& pixel : inputPixels) {
-    // Check if the color is in the map
-    if (pixelMap.find(pixel) == pixelMap.end()) {
-      // Assign a new index to this color
-      auto index = static_cast<uint32_t>(pixelMap.size());
-      pixelMap[pixel] = index;
-    }
-  }*/
-   // Return the pixel map
-
 
 
 template <typename T>
