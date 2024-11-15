@@ -33,10 +33,10 @@ FetchContent_Declare(GSL
         GIT_SHALLOW TRUE)
 FetchContent_MakeAvailable(GSL)
 
-#[[# Enable clang-tidy
+# Enable clang-tidy
 set(CMAKE_CXX_CLANG_TIDY clang-tidy-19;
         -format-style=file;
-        -header-filter=.;)]]
+        -header-filter=.;)
 
 
 # Add include directory
