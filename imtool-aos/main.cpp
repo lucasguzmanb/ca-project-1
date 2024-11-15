@@ -68,7 +68,7 @@ int main(int const argc, char * argv[]) { // NOLINT(readability-function-size)
     }
     newMetadata.width  = args.extra[0];
     newMetadata.height = args.extra[1];
-  } /*else if (args.operation == "cutfreq") {
+  } else if (args.operation == "cutfreq") {
     if (isInputUint8) {
       outputPixels8 = inputPixels8;
       removeLFCaos<uint8_t>(outputPixels8, args.extra[0]);
@@ -76,7 +76,7 @@ int main(int const argc, char * argv[]) { // NOLINT(readability-function-size)
       outputPixels16 = inputPixels16;
       removeLFCaos<uint16_t>(outputPixels16, args.extra[0]);
     }
-  } */ else if (args.operation == "compress") {
+  } else if (args.operation == "compress") {
     newMetadata.format = "C6";
     if (isInputUint8) {
       compress(inputPixels8, outputFile, newMetadata);
